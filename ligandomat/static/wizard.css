@@ -1,0 +1,99 @@
+#header{
+ width:850px;
+ padding: 20px;
+ border-width: 2px;
+ border-style: solid;
+ border-color: #BBBBBB;
+ background-color: #DDDDDD;
+}
+
+#frame {
+ float:left;
+ margin-top:30px;
+ padding: 20px;
+ width: 850px;
+ border-width: 2px;
+ border-style: solid;
+ border-color: grey;
+ background-color: #FAFAFA;
+}
+
+#prechoice{
+ 
+}
+
+/*  inputs  */
+
+#input {
+ height:250px;
+}
+
+#static_box {
+ float : left;
+ width: 415px;
+ border-style: solid;
+ border-width: 0px 2px 0px 0px;
+ border-color: grey;
+ height:250px;
+}
+
+.box {
+ padding:10px;
+ margin:5px;
+ background-color: #DDDDDD;
+}
+
+#variable_box {
+ float: left;
+ width: 390px;
+ padding-left: 10px;
+}
+
+#new_box {
+ 
+}
+
+#hla_box {
+ height: 150px;
+}
+
+#selected_hlas {
+ border-width: 1px;
+ border-style: solid;
+ border-color: #888666;
+}
+
+
+/* Runs */
+
+#run_div {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
