@@ -8,7 +8,7 @@ from .models import (
 
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
-from ligandomat.security import groupfinder
+from security import groupfinder
 
 import MySQLdb
 
