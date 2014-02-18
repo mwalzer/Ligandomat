@@ -1,13 +1,55 @@
-<%inherit file='ligandomat:templates/layout.mako'/>
+##<%inherit file='ligandomat:templates/layout.mako'/>
+##<script></script>
 
-<form method="post" >
+<head>
+<title>test</title>
+<link type="text/css" href="static/query.css" rel="stylesheet">
 
+</head>
+
+
+<body>
+<div id='header'>
+    <picfloatL><img src="elch_logo.jpg" height="100" /></picfloatL>
+    <span>Ligandosphere</span>
+    <picfloatR><img src="logo-uni-tuebingen.png" height="100" /></picfloatR>
+    </div>
+
+<p></p>
+
+<div id='navigation' >
+<h3>
+<a href="/" >Start</a>&nbsp;&nbsp;&nbsp;
+<a href="query" >Database</a>&nbsp;&nbsp;&nbsp;
+<a href="prediction" >Peptide Prediction</a>&nbsp;&nbsp;&nbsp;
+<a href="hlatyping"> HLA Typing </a>&nbsp;&nbsp;&nbsp;
+<!--<a href="http://192.168.123.136:9999/Mslots">Mascot slots status</a>&nbsp;&nbsp;&nbsp;-->
+<a href="http://192.168.123.136/mascot/x-cgi/ms-status.exe">Mascot slots status</a>&nbsp;&nbsp;&nbsp;
+<a href="http://192.168.123.136:9999/Mupdate">Mascot slot update</a></h3>
+</div>
 
 <div id='content'>
 <form action="/query" method="post">
   <table >
 
+   <!-- SEARCH FOR A SEQUENCE -->
+   <!--
+   <tr>
+   <td>Search for a sequence:</td>
+   <td><input  style="font-size:14px" name="sequence" type="text" /></td>
+   </tr>
 
+   <tr>
+   <td>Sort the result by: <select style="font-size:14px" name="sorting_seq">
+       <option value="sequence" selected="selected">sequence</option>
+       <option value="sourcename">source</option>
+       <option value="runname">runname</option>
+       </select></td>
+   <td><input style="font-size:14px" value="Go!" type="submit", name="search_by_seq" /></td>
+   </tr>
+
+   <td>&nbsp;</td>
+   -->
 
    <!-- SEARCH FOR A SUBSEQUENCE -->
    <tr>
@@ -27,7 +69,7 @@
   onclick="alert('For each character use _ as wildcard, for many characters use % as wildcard');">
     </p>
     </form>
-    <input style="font-size:14px" value="Go!" type="submit" name="search_by_subsequence" /></td>
+    <input style="font-size:14px" value="Go!" type="submit", name="search_by_subsequence" /></td>
    </tr>
 
    <td>&nbsp;</td>
@@ -50,7 +92,7 @@
     <input type="button" name="wildcard-info" value="Wildcard Info"
   onclick="alert('For each character use _ as wildcard, for many characters use % as wildcard');">
     </p>
-    </form><input style="font-size:14px" value="Go!" type="submit" name="search_by_runname" /></td>
+    </form><input style="font-size:14px" value="Go!" type="submit", name="search_by_runname" /></td>
    </tr>
 
 
@@ -74,7 +116,7 @@
     <input type="button" name="wildcard-info" value="Wildcard Info"
   onclick="alert('For each character use _ as wildcard, for many characters use % as wildcard');">
     </p>
-    </form><input style="font-size:14px" value="Go!" type="submit" name="search_by_organ" /></td>
+    </form><input style="font-size:14px" value="Go!" type="submit", name="search_by_organ" /></td>
    </tr>
 
 
@@ -98,7 +140,7 @@
     <input type="button" name="wildcard-info" value="Wildcard Info"
   onclick="alert('For each character use _ as wildcard, for many characters use % as wildcard');">
     </p>
-    </form><input style="font-size:14px" value="Go!" type="submit" name="search_by_tissue" /></td>
+    </form><input style="font-size:14px" value="Go!" type="submit", name="search_by_tissue" /></td>
    </tr>
 
 
@@ -108,100 +150,11 @@
     <!-- SEARCH FOR ALL PEPTIDES -->
     <tr>
    <td>Get all peptides from the database:</td>
-   <td><input style="font-size:14px" value="Go!" type="submit" name="search_all" /></td>
+   <td><input style="font-size:14px" value="Go!" type="submit", name="search_all" /></td>
    </tr>
 
    </table>
 </form>
 </div>
-
-<%doc>
-<table>
-	<tr>
-		<td> PEPTIDE
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-			List of all Peptides : 
-		</td>
-		<td>
-		</td>
-		<td>
-			<input type='submit' name='button_peptide_all' value='All Peptides'>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Get Info about the peptide :
-		</td>
-		<td>
-			${form.peptide_info} 
-		</td>
-		<td>
-			<input type="submit" name="button_peptide_info" value="Get info" />
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Get all Peptides with Pattern :
-		</td>
-		<td>
-			${form.peptide_pattern} 
-		</td>
-		<td>
-			<input type="submit" name="button_peptide_pattern" value="Get PatternPeptides" />
-		</td>
-	</tr>
-	<tr>
-		<td> * * * * *
-		</td>
-	</tr>
-	<tr>
-		<td> SOURCE
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Show details of source : 
-		</td>
-		<td>
-			${form.source_detail}
-		</td>
-		<td>
-			<input type='submit' name='button_source_detail' value='Source details'>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Show peptides of source : 
-		</td>
-		<td>
-			${form.source_peptides}
-		</td>
-		<td>
-			<input type='submit' name='button_source_peptides' value='Source peptides'>
-		</td>
-	</tr>
-	
-</table>
-<br><br><br>
-
-<input type='submit' name='button_get_mining_csv' value='Get mining csv'>
-
-
-
-</form>
-
-<style type="text/css">
-td {
-	height:30px;
-}
-
-a {
-	text-decoration:none;
-}
-</style>
-
-</%doc>
+    <p>&nbsp;</p>
+</body>

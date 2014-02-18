@@ -19,7 +19,7 @@ Feel free to use gently!<br>
 <br>
 If you have any questions visit the help site.<br>
 In case it does not help, rethink.<br>
-After 40 minutes of exhausting brain usage you may anoy me : laura.weidmann@hotmail.de<br>
+<br>
 <br>
 <br>
 <br>
@@ -31,7 +31,6 @@ what the elk binds!<br>
 <br>
 Hit <a href="${request.route_url('login')}">Login</a><br>
 <br>
-&copy; Copyright 2013, Ligandomat Gmbh.
 
 </div>
 <img  class='peptide'src="${request.static_url('ligandomat:static/peptidgraubunt.jpg')}" width="120" />

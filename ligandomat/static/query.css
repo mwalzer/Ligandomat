@@ -1,0 +1,185 @@
+
+
+body {
+ font-family: Arial, Helvetica, sans-serif;
+ font-size: 13px;
+}
+#wrapper { 
+ margin: 0 auto;
+ width:90%;
+}
+#header {
+ width: 90%;
+ padding: 10px;
+ border: 1px solid #ccc;
+ height: 100px;
+ margin: 10px 0px 5px 0px;
+ 
+ border-width: 2px;
+ border-style: solid;
+ border-color: #BBBBBB;
+ background-color: #DDDDDD;
+ font-size:36pt;
+ font-weight:bold;
+ text-align:center;
+ vertical-align:-25px;
+}
+
+span{display:inline-block; vertical-align:-60px }
+
+#navigation {
+ width: 90%;
+ color: #333;
+ padding: 10px;
+ border: 1px solid #ccc;
+ margin: 0px 0px 5px 0px;
+ 
+ border-width: 2px;
+ border-style: solid;
+ border-color: #BBBBBB;
+ background-color: #c6c6c6;
+}
+
+
+
+#content { 
+ width: 90%;
+ color: #333;
+ border: 1px solid #ccc;
+ background: #F2F2E6;
+ margin: 0px 0px 5px 0px;
+ padding: 10px;
+ font-size:15px;
+}
+
+a{text-align:justify;
+	text-decoration:none;
+	}
+
+
+h1{font-size:36pt;text-align:center;}
+table{padding:5px;}
+
+picfloatL{float:left;}
+picfloatR{float:right;}
+/*
+
+#header{
+ width:80%;
+ height:100px;
+ padding: 20px;
+ border-width: 2px;
+ border-style: solid;
+ border-color: #BBBBBB;
+ background-color: #DDDDDD;
+}
+
+
+
+
+#headertext{
+ text-align:center;
+}
+
+/*
+#header{
+ margin : -5px;
+ border-style : solid;
+ border-width : 0px 0px 2px 0px;
+ border-color : black;
+ height: 100px
+}*/
+/*
+
+#frame {
+ float:left;
+ margin-top:30px;
+ padding: 20px;
+ width: 850px;
+ border-width: 2px;
+ border-style: solid;
+ border-color: grey;
+ background-color: #FAFAFA;
+}
+
+#prechoice{
+ 
+}
+
+/*  inputs  
+
+#input {
+ height:250px;
+}
+
+#static_box {
+ float : left;
+ width: 415px;
+ border-style: solid;
+ border-width: 0px 2px 0px 0px;
+ border-color: grey;
+ height:250px;
+}
+
+.box {
+ padding:10px;
+ margin:5px;
+ background-color: #DDDDDD;
+}
+
+#variable_box {
+ float: left;
+ width: 390px;
+ padding-left: 10px;
+}
+
+#new_box {
+ 
+}
+
+#hla_box {
+ height: 150px;
+}
+
+#selected_hlas {
+ border-width: 1px;
+ border-style: solid;
+ border-color: #888666;
+}
+
+
+/* Runs */
+
+#run_div {
+
+}
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

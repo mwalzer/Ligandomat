@@ -9,6 +9,5 @@ First, please select the file and afterwards hit the button :<br><br>
 
     <input type="submit" name="form.submitted2" value="Upload this file" /><br><br>
     
-    
-Tadaaaa!
+
 </form>

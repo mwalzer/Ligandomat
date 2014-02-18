@@ -5,7 +5,7 @@ from pyramid import testing
 
 from .models import DBSession
 
-
+# TOOD: may remove cause it is not used anymore!
 class TestMyView(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
