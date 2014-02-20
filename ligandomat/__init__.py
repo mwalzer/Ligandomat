@@ -40,7 +40,6 @@ def main(global_config, **settings):
     config.add_route('logout', '/logout')
     config.add_route('Ligandomat', '/Ligandomat')
     config.add_route('fyi', '/FYI')
-    config.add_route('start', '/start')
 
     #action one of load_list, source, prep, run, overview
     config.add_route('upload', '/Ligandomat/upload/{action}/{attach}')

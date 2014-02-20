@@ -1,4 +1,13 @@
 __author__ = 'Backert'
+"""File contains queries strings:
+
+ - search_by_subsequence
+ - search_all
+ - search_by_runname
+ - search_by_organ
+ - search_by_tissue
+"""
+
 search_by_subsequence = """	SELECT
     sequence,
     sourcename,
@@ -172,44 +181,46 @@ SELECT
     dignity
 from
     ((((((SElECT
-		source_id,
-		name as sourcename,
-		organ,
-		tissue,
-		dignity
+        source_id, name as sourcename, organ, tissue, dignity
     from
         source
     WHERE
         organ = '%s') organs
-        INNER JOIN
-    source_hlatyping ON source_hlatyping.source_source_id =organs.source_id
-        )INNER JOIN
-	(Select
-		hlaallele_id,
-		gene_group
-	from hlaallele) hlaallele_select ON source_hlatyping.hlaallele_hlaallele_id = hlaallele_select.hlaallele_id
-		)INNER JOIN
-		(SELECT
-        ms_run_id,
-		source_source_id,
-        filename,
-		mhcpraep_mhcpraep_id
+    INNER JOIN (SELECT
+        source_source_id, hlaallele_hlaallele_id
     FROM
-		ms_run) ms_runs ON ms_runs.source_source_id = source_id
-		)INNER JOIN
-	(SELECT
-		mhcpraep_id,
-		antibody_set,
-		sample_mass,
-		sample_volume
-	FROM mhcpraep
-	)mhcpraeps ON mhcpraep_mhcpraep_id = mhcpraeps.mhcpraep_id
-		)INNER JOIN
-
-	spectrum_hit ON ms_run_ms_run_id = ms_run_id
-		) INNER JOIN peptide ON peptide_peptide_id = peptide.peptide_id  WHERE ionscore >19 AND e_value <1
-
-GROUP BY sequence ORDER BY %s  ASC LIMIT 0, 10000
+        source_hlatyping) source_hlatypings ON source_hlatypings.source_source_id = organs.source_id)
+    INNER JOIN (Select
+        hlaallele_id, gene_group
+    from
+        hlaallele) hlaallele_select ON source_hlatypings.hlaallele_hlaallele_id = hlaallele_select.hlaallele_id)
+    INNER JOIN (SELECT
+        ms_run_id, source_source_id, filename, mhcpraep_mhcpraep_id
+    FROM
+        ms_run) ms_runs ON ms_runs.source_source_id = source_id)
+    INNER JOIN (SELECT
+        mhcpraep_id, antibody_set
+    FROM
+        mhcpraep) mhcpraeps ON mhcpraep_mhcpraep_id = mhcpraeps.mhcpraep_id)
+    INNER JOIN (SELECT
+        RT,
+            MZ,
+            ionscore,
+            e_value,
+            ms_run_ms_run_id,
+            peptide_peptide_id
+    FROM
+        spectrum_hit
+    WHERE
+        ionscore > 19 AND e_value < 1) spectrum_hits ON spectrum_hits.ms_run_ms_run_id = ms_run_id)
+        INNER JOIN
+        ( SELECT
+		peptide_id,
+		sequence
+	FROM peptide) peptides ON spectrum_hits.peptide_peptide_id = peptides.peptide_id
+GROUP BY sequence
+ORDER BY %s ASC
+LIMIT 0 , 10000
 
 """
 
@@ -269,7 +280,10 @@ from
 		)INNER JOIN
 
 	spectrum_hit ON ms_run_ms_run_id = ms_run_id
-		) INNER JOIN peptide ON peptide_peptide_id = peptide.peptide_id  WHERE ionscore >19 AND e_value <1
+		) INNER JOIN ( SELECT
+		peptide_id,
+		sequence
+	FROM peptide) peptides ON ON peptide_peptide_id = peptides.peptide_id  WHERE ionscore >19 AND e_value <1
 
 GROUP BY sequence ORDER BY %s  ASC LIMIT 0, 10000
 

@@ -36,12 +36,6 @@ from tools import reader, patternRec
 import tools
 import presentData
 
-# Test Page ----------------------------------------------------------------------------------------------------------
-@view_config(route_name='start', renderer='ligandomat:templates/basic.mako', permission='view')
-def start(request):
-    return dict(logged_in=authenticated_userid(request))
-
-
 # Index Page ----------------------------------------------------------------------------------------------------------
 @view_config(route_name='home', renderer='ligandomat:templates/index.mako', permission='view')
 def index(request):
@@ -51,6 +45,7 @@ def index(request):
 # Login ----------------------------------------------------------------------------------------------------------
 @view_config(route_name='login', renderer='ligandomat:templates/login.mako', permission='view')
 def login(request):
+    """ Login function using md5 hashing for security check."""
     login_url = request.route_url('home')
     referrer = request.url
     if referrer == login_url:
@@ -86,6 +81,10 @@ def login(request):
 # Logout ----------------------------------------------------------------------------------------------------------
 @view_config(route_name='logout')
 def logout(request):
+    """ Logout function
+
+    TODO: Remove already uploaded session data.
+    """
     headers = forget(request)
     return HTTPFound(location=request.route_url('home'),
                      headers=headers)
@@ -102,6 +101,7 @@ def choice_page(request):
 # DB Statistics ---------------------------------------------------------------------------------------------------------------------
 @view_config(route_name='statistics', renderer='ligandomat:templates/output/statistics.mako', permission='view')
 def statistics_page(request):
+    """ Old statistics page. Should be removed"""
     seqs = getAllPeptide_Sequence(DBSession, Peptide)
 
     return dict(logged_in=authenticated_userid(request),
@@ -114,9 +114,15 @@ def statistics_page(request):
 @view_config(route_name='data_access', renderer='ligandomat:templates/output/data_query.mako',
              match_param='action=query', permission='view')
 def access_data_query(request):
+    """"Query website and funcitonality
+
+    The query-strings are in queries.py.
+    Connection to the DB using MySQLdb. NOT pyramid!
+    """
     form = DataQuery(request.POST)
     form.setChoices()
     session = request.session
+    # Getting all the parameters from the input Mako
     pat = request.params.get('subsequence')
     pat_sorting_by = request.params.get('sorting_pat')
     run_pat = request.params.get('runname_subsequence')
@@ -126,7 +132,7 @@ def access_data_query(request):
     tissue = request.params.get('tissue_subsequence')
     tissue_sorting_by = request.params.get('sorting_tissue')
 
-
+    # Connecting to the DB using MySQLdb
     conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd, db=config.db,
                            port=config.port)
     c = conn.cursor(MySQLdb.cursors.DictCursor)
@@ -150,9 +156,8 @@ def access_data_query(request):
         output = template('table_all_sequences', rows=result)
 
     if 'search_by_runname' in request.params:
-        c.execute(
-            "SELECT sequence, RT, MZ, ionscore, e_value, antibody_set,sourcename,organ,tissue,dignity,gene_group FROM (SELECT * FROM (SELECT ms_run_ms_run_id as peptidems_id, sequence, RT, MZ, ionscore, e_value FROM spectrum_hit INNER JOIN peptide ON peptide_id = peptide_peptide_id WHERE ionscore >19 AND e_value<1) peptide INNER JOIN (SELECT ms_run_id, source_source_id as mssource_id, filename as runname, antibody_set, sample_mass, sample_volume FROM ms_run INNER JOIN mhcpraep ON mhcpraep_mhcpraep_id = mhcpraep_id WHERE filename like '%s') ms ON ms_run_id = peptidems_id) peprun  INNER JOIN (SELECT source_id, name as sourcename, organ, tissue, dignity, typing_source_id, gene_group, specific_protein, dna_coding, dna_noncoding, expression_suffix FROM source INNER JOIN (SELECT source_source_id as typing_source_id, gene_group, specific_protein, dna_coding, dna_noncoding, expression_suffix FROM source_hlatyping  INNER JOIN hlaallele ON hlaallele_hlaallele_id = hlaallele_id) typing ON source_id = typing_source_id ) source  ON source_id = mssource_id ORDER BY %s ASC" % (
-                run_pat, runname_sorting_by))
+        querystring = queries.search_by_runname
+        c.execute(querystring % (run_pat, runname_sorting_by))
         result = c.fetchall()
         #	result = database_prediction(result)
         #result = annotate(result)
@@ -163,7 +168,7 @@ def access_data_query(request):
 
     if 'search_by_organ' in request.params:
         querystring = queries.search_by_organ
-        c.execute(querystring % (tissue, tissue_sorting_by))
+        c.execute(querystring % (organ, organ_sorting_by))
         result = c.fetchall()
         #result = database_prediction(result)
         #result = annotate(result)
@@ -183,7 +188,7 @@ def access_data_query(request):
         result = template.render(rows=result)
         return Response(result)
 
-
+    #  Old query webpage
     # # PEPTIDE
     # if 'button_peptide_all' in request.params:
     #     #session['action'] = 'peptide_all'
@@ -217,6 +222,7 @@ def access_data_query(request):
     #     con.getMiningTable(name)
     #     return HTTPFound(location=request.route_url('Ligandomat'))
 
+    # If no case was selected return to the site itself
     return dict(form=form, logged_in=authenticated_userid(request))
 
 
@@ -224,6 +230,7 @@ def access_data_query(request):
 @view_config(route_name='data_access', renderer='ligandomat:templates/output/peptides.mako',
              match_param='action=output_peptides', permission='view')
 def access_data_output_peptides(request):
+    """ Old peptide query result page. Not used anymore!"""
 
 
 
@@ -270,6 +277,8 @@ def access_data_output_peptides(request):
     #                 table=table)
 
     #session.invalidate()
+
+
     return dict(logged_in=authenticated_userid(request),
                 message=message,
                 table=table)
@@ -279,6 +288,7 @@ def access_data_output_peptides(request):
 @view_config(route_name='data_access', renderer='ligandomat:templates/output/sources.mako',
              match_param='action=output_sources', permission='view')
 def access_data_output_source(request):
+    """ Old source query result page. Not used anymore!"""
     session = request.session
     action = session['action']
 
@@ -305,6 +315,7 @@ def unallowed(request):
 # For your Information	
 @view_config(route_name='fyi', renderer='ligandomat:templates/fyi.mako', permission='view')
 def fyi(request):
+    """ Some kind of error page. Has to be changed or removed."""
     message = request.session['fyi']
     image = request.session['image']
     return dict(logged_in=authenticated_userid(request), message=message, image=image)
