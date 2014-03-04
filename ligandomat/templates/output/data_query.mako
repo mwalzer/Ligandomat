@@ -18,7 +18,7 @@
                                                 '<td>Sequence:</td> '+
                                         '<td><input style="font-size:14px" name="sequence" type="text" /></td>' +
 
-                                        '<td><button id = "sequence" onclick=removeCriteria("sequence")>-</button></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "sequence" onclick=removeCriteria("sequence")></td>' +
                                 '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -31,7 +31,7 @@
 
                                         '<td><input style="font-size:14px" name="run_name" type="text" /></td>' +
 
-                                        '<td><button id = "run_name" onclick=removeCriteria("run_name")>-</button></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "run_name" onclick=removeCriteria("run_name")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -44,7 +44,7 @@
 
                                         '<td><input style="font-size:14px" name="source_name" type="text" /></td>' +
 
-                                        '<td><button id = "source_name" onclick=removeCriteria("source_name")>-</button></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "source_name" onclick=removeCriteria("source_name")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -57,7 +57,7 @@
 
                                         '<td><input style="font-size:14px" name="organ" type="text" /></td>' +
 
-                                        '<td><button id = "organ" onclick=removeCriteria("organ")>-</button></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "organ" onclick=removeCriteria("organ")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -69,7 +69,7 @@
 
                                         '<td><input style="font-size:14px" name="tissue" type="text" /></td>' +
 
-                                        '<td><button id = "tissue" onclick=removeCriteria("tissue")>-</button></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "tissue" onclick=removeCriteria("tissue")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -82,7 +82,7 @@
 
                                         '<td><input style="font-size:14px" name="dignity" type="text" /></td>' +
 
-                                        '<td><button id = "dignity" onclick=removeCriteria("dignity")>-</button></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"  id = "dignity" onclick=removeCriteria("dignity")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -95,7 +95,7 @@
 
                                         '<td><input style="font-size:14px" name="researcher" type="text" /></td>' +
 
-                                        '<td><button id = "researcher" onclick=removeCriteria("researcher")>-</button></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"  id = "researcher" onclick=removeCriteria("researcher")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -108,7 +108,7 @@
 
                                         '<td><input style="font-size:14px" name="source_hla_typing" type="text" /></td>' +
 
-                                        '<td><button id = "source_hla_typing" onclick=removeCriteria("source_hla_typing")>-</button></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"  id = "source_hla_typing" onclick=removeCriteria("source_hla_typing")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -134,6 +134,8 @@
     <tr></tr>
 
 </table>
+<table>
+    <tr><td>
 <select id="query" style="font-size:14px" name="query">
     <option value="sequence" selected="selected">Sequence</option>
     <option value="run_name">Run name</option>
@@ -144,12 +146,21 @@
     <option value="researcher">Researcher</option>
     <option value="source_hla_typing">Source hla typing</option>
 
-</select>
-<button onclick="appendCriteria()">+</button>
-<br><br><br><br>
+</select></td><td>
+<input type="image" src="../../static/plus.png" height="22" onclick="appendCriteria()">
+    </td>
+<td width ="150"></td>
+<td>
+    <input style="font-size:14px" value="Search Database" type="submit" name="search" >
+</td>
+
+    </tr>
+</table>
+<br><br>
+<hr width="100%"><br>
 <table style="width:400px" id="filter_list">
-<tr><td>Filter:</td></tr>
-<tr><td>Ionscore </td><td>< </td> <td><input style="font-size:14px" name="ionscore" type="text" value="20" /></td></tr>
+<tr><td><b>Filter:</b></td></tr>
+<tr><td>Ion score </td><td>< </td> <td><input style="font-size:14px" name="ionscore" type="text" value="20" /></td></tr>
 
 <tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" name="e-Value" type="text" value="1"/></td></tr>
 
@@ -162,9 +173,4 @@
 
 </body>
 </html>
-<style type="text/css">
-    ul {
-        list-style-type: none;
-    }
-</style>
 

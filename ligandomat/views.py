@@ -119,9 +119,13 @@ def access_data_query(request):
     The query-strings are in queries.py.
     Connection to the DB using MySQLdb. NOT pyramid!
     """
+
+
+
     form = DataQuery(request.POST)
     form.setChoices()
     session = request.session
+
     # Getting all the parameters from the input Mako
     pat = request.params.get('subsequence')
     pat_sorting_by = request.params.get('sorting_pat')
@@ -132,10 +136,28 @@ def access_data_query(request):
     tissue = request.params.get('tissue_subsequence')
     tissue_sorting_by = request.params.get('sorting_tissue')
 
+    # Collecting input from Mako
+    sequence = request.params.get('sequence')
+    run_name = request.params.get('run_name')
+    source_name = request.params.get('source_name')
+    organ = request.params.get('organ')
+    tissue = request.params.get('tissue')
+    dignity = request.params.get('dignity')
+    researcher = request.params.get('researcher')
+    source_hla_typing = request.params.get('source_hla_typing')
+
+    # Collecting filters from Mako
+    ionscore = request.params.get('ionscore')
+    e_value = request.params.get('e-Value')
+    q_value = request.params.get('q-Value')
+
+
+
     # Connecting to the DB using MySQLdb
     conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd, db=config.db,
                            port=config.port)
     c = conn.cursor(MySQLdb.cursors.DictCursor)
+
 
     if 'search_by_subsequence' in request.params:
         searchstring = pat
