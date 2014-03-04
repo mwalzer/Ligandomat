@@ -1,207 +1,170 @@
 <%inherit file='ligandomat:templates/layout.mako'/>
+<html >
+<head>
+    <title>test</title>
+    <script src="../../static/jquery-2.1.0.js"></script>
 
-<form method="post" >
+    <script>
+        function appendCriteria() {
+            $(document).ready(function () {
+                        var e = document.getElementById("query");
+                        var strUser = e.options[e.selectedIndex].value;
 
+                        if (strUser == "sequence") {
+                            if ($("#sequence").length === 0) {
+                                var element =
+                                        '<tr id = "sequence" name = "sequence">' +
 
-<div id='content'>
-<form action="/query" method="post">
-  <table >
+                                                '<td>Sequence:</td> '+
+                                        '<td><input style="font-size:14px" name="sequence" type="text" /></td>' +
 
-
-
-   <!-- SEARCH FOR A SUBSEQUENCE -->
-   <tr>
-   <td>Search for a sequence:</td>
-   <td><input style="font-size:14px" name="subsequence" type="text" /></td>
-   </tr>
-
-   <tr>
-   <td>Sort the result by: <select style="font-size:14px" name="sorting_pat">
-       <option value="sequence" selected="selected">sequence</option>
-       <option value="sourcename">source</option>
-       <option value="runname">runname</option>
-       </select></td>
-   <td><form>
-    <p>
-    <input type="button" name="wildcard-info" value="Wildcard Info"
-  onclick="alert('For each character use _ as wildcard, for many characters use % as wildcard');">
-    </p>
-    </form>
-    <input style="font-size:14px" value="Go!" type="submit" name="search_by_subsequence" /></td>
-   </tr>
-
-   <td>&nbsp;</td>
-
-    <!-- SEARCH FOR MS_RUNS -->
-   <tr>
-   <td>Search for ms_runs:</td>
-
-   <td><input style="font-size:14px" name="runname_subsequence" type="text" /></td>
-   </tr>
-
-   <tr>
-   <td>Sort the result by: <select style="font-size:14px" name="sorting_runname">
-       <option value="sequence" selected="selected">sequence</option>
-       <option value="sourcename">source</option>
-       <option value="runname">runname</option>
-       </select></td>
-   <td><form>
-    <p>
-    <input type="button" name="wildcard-info" value="Wildcard Info"
-  onclick="alert('For each character use _ as wildcard, for many characters use % as wildcard');">
-    </p>
-    </form><input style="font-size:14px" value="Go!" type="submit" name="search_by_runname" /></td>
-   </tr>
+                                        '<td><button id = "sequence" onclick=removeCriteria("sequence")>-</button></td>' +
+                                '</tr>';
+                                $("tr:first").append(element);
+                            }
+                        }
+                        else if (strUser == "run_name") {
+                            if ($("#run_name").length === 0) {
+                                var element = '<tr id = "run_name" name = "run_name">' +
+                                        '<td>Runname: </td>'+
 
 
-   <td>&nbsp;</td>
+                                        '<td><input style="font-size:14px" name="run_name" type="text" /></td>' +
 
-        <!-- SEARCH FOR organ -->
-   <tr>
-   <td>Search for organ:</td>
-
-   <td><input style="font-size:14px" name="organ_subsequence" type="text" /></td>
-   </tr>
-
-   <tr>
-   <td>Sort the result by: <select style="font-size:14px" name="sorting_organ">
-       <option value="sequence" selected="selected">sequence</option>
-       <option value="sourcename">source</option>
-       <option value="runname">runname</option>
-       </select></td>
-   <td><form>
-    <p>
-    <input type="button" name="wildcard-info" value="Wildcard Info"
-  onclick="alert('For each character use _ as wildcard, for many characters use % as wildcard');">
-    </p>
-    </form><input style="font-size:14px" value="Go!" type="submit" name="search_by_organ" /></td>
-   </tr>
+                                        '<td><button id = "run_name" onclick=removeCriteria("run_name")>-</button></td>' +
+                                        '</tr>';
+                                $("tr:first").append(element);
+                            }
+                        }
+                        else if (strUser == "source_name") {
+                            if ($("#source").length === 0) {
+                                var element = '<tr id = "source_name" name = "source">' +
+                                        '<td>Source name: </td>'+
 
 
+                                        '<td><input style="font-size:14px" name="source_name" type="text" /></td>' +
 
-   <td>&nbsp;</td>
-    <!-- SEARCH FOR tissue -->
-   <tr>
-   <td>Search for tissue:</td>
-
-   <td><input style="font-size:14px" name="tissue_subsequence" type="text" /></td>
-   </tr>
-
-   <tr>
-   <td>Sort the result by: <select style="font-size:14px" name="sorting_tissue">
-       <option value="sequence" selected="selected">sequence</option>
-       <option value="sourcename">source</option>
-       <option value="runname">runname</option>
-       </select></td>
-   <td><form>
-    <p>
-    <input type="button" name="wildcard-info" value="Wildcard Info"
-  onclick="alert('For each character use _ as wildcard, for many characters use % as wildcard');">
-    </p>
-    </form><input style="font-size:14px" value="Go!" type="submit" name="search_by_tissue" /></td>
-   </tr>
+                                        '<td><button id = "source_name" onclick=removeCriteria("source_name")>-</button></td>' +
+                                        '</tr>';
+                                $("tr:first").append(element);
+                            }
+                        }
+                        else if (strUser == "organ") {
+                            if ($("#organ").length === 0) {
+                                var element = '<tr id = "organ" name = "organ">' +
+                                        '<td>Organ: </td>'+
 
 
+                                        '<td><input style="font-size:14px" name="organ" type="text" /></td>' +
 
-   <td>&nbsp;</td>
+                                        '<td><button id = "organ" onclick=removeCriteria("organ")>-</button></td>' +
+                                        '</tr>';
+                                $("tr:first").append(element);
+                            }
+                        }
+                        else if (strUser == "tissue") {
+                            if ($("#tissue").length === 0) {
+                                var element = '<tr id = "tissue" name = "tissue">' +
+                                        '<td>Tissue: </td>'+
 
-    <!-- SEARCH FOR ALL PEPTIDES -->
-    <tr>
-   <td>Get all peptides from the database:</td>
-   <td><input style="font-size:14px" value="Go!" type="submit" name="search_all" /></td>
-   </tr>
+                                        '<td><input style="font-size:14px" name="tissue" type="text" /></td>' +
 
-   </table>
-</form>
-</div>
+                                        '<td><button id = "tissue" onclick=removeCriteria("tissue")>-</button></td>' +
+                                        '</tr>';
+                                $("tr:first").append(element);
+                            }
+                        }
+                        else if (strUser == "dignity") {
+                            if ($("#dignity").length === 0) {
+                                var element = '<tr id = "dignity" name = "dignity">' +
+                                        '<td>Dignity: </td>'+
 
-<%doc>
-<table>
-	<tr>
-		<td> PEPTIDE
-		</td>
-	</tr>
 
-	<tr>
-		<td>
-			List of all Peptides : 
-		</td>
-		<td>
-		</td>
-		<td>
-			<input type='submit' name='button_peptide_all' value='All Peptides'>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Get Info about the peptide :
-		</td>
-		<td>
-			${form.peptide_info} 
-		</td>
-		<td>
-			<input type="submit" name="button_peptide_info" value="Get info" />
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Get all Peptides with Pattern :
-		</td>
-		<td>
-			${form.peptide_pattern} 
-		</td>
-		<td>
-			<input type="submit" name="button_peptide_pattern" value="Get PatternPeptides" />
-		</td>
-	</tr>
-	<tr>
-		<td> * * * * *
-		</td>
-	</tr>
-	<tr>
-		<td> SOURCE
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Show details of source : 
-		</td>
-		<td>
-			${form.source_detail}
-		</td>
-		<td>
-			<input type='submit' name='button_source_detail' value='Source details'>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Show peptides of source : 
-		</td>
-		<td>
-			${form.source_peptides}
-		</td>
-		<td>
-			<input type='submit' name='button_source_peptides' value='Source peptides'>
-		</td>
-	</tr>
-	
+                                        '<td><input style="font-size:14px" name="dignity" type="text" /></td>' +
+
+                                        '<td><button id = "dignity" onclick=removeCriteria("dignity")>-</button></td>' +
+                                        '</tr>';
+                                $("tr:first").append(element);
+                            }
+                        }
+                        else if (strUser == "researcher") {
+                            if ($("#researcher").length === 0) {
+                                var element = '<tr id = "researcher" name = "researcher">' +
+                                        '<td>Researcher: </td>'+
+
+
+                                        '<td><input style="font-size:14px" name="researcher" type="text" /></td>' +
+
+                                        '<td><button id = "researcher" onclick=removeCriteria("researcher")>-</button></td>' +
+                                        '</tr>';
+                                $("tr:first").append(element);
+                            }
+                        }
+                        else if (strUser == "source_hla_typing") {
+                            if ($("#source_hla_typing").length === 0) {
+                                var element = '<tr id = "source_hla_typing" name = "source_hla_typing">' +
+                                        '<td>Source hla typing: </td>'+
+
+
+                                        '<td><input style="font-size:14px" name="source_hla_typing" type="text" /></td>' +
+
+                                        '<td><button id = "source_hla_typing" onclick=removeCriteria("source_hla_typing")>-</button></td>' +
+                                        '</tr>';
+                                $("tr:first").append(element);
+                            }
+                        }
+
+
+                    }
+            )
+        }
+
+        function removeCriteria(selected_id) {
+            $('[id^="' + selected_id + '"]').remove()
+        }
+
+
+    </script>
+
+
+</head>
+
+<body>
+<table style="width:500px" id="ul_navigation">
+    <tr></tr>
+
 </table>
-<br><br><br>
+<select id="query" style="font-size:14px" name="query">
+    <option value="sequence" selected="selected">Sequence</option>
+    <option value="run_name">Run name</option>
+    <option value="source_name">Source name</option>
+    <option value="organ">Organ</option>
+    <option value="tissue">Tissue</option>
+    <option value="dignity">Dignity</option>
+    <option value="researcher">Researcher</option>
+    <option value="source_hla_typing">Source hla typing</option>
 
-<input type='submit' name='button_get_mining_csv' value='Get mining csv'>
+</select>
+<button onclick="appendCriteria()">+</button>
+<br><br><br><br>
+<table style="width:400px" id="filter_list">
+<tr><td>Filter:</td></tr>
+<tr><td>Ionscore </td><td>< </td> <td><input style="font-size:14px" name="ionscore" type="text" value="20" /></td></tr>
+
+<tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" name="e-Value" type="text" value="1"/></td></tr>
+
+<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" name="q-Value" type="text" value="1" /></td></tr>
+
+
+</table>
 
 
 
-</form>
-
+</body>
+</html>
 <style type="text/css">
-td {
-	height:30px;
-}
-
-a {
-	text-decoration:none;
-}
+    ul {
+        list-style-type: none;
+    }
 </style>
 
-</%doc>
