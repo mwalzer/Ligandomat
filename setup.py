@@ -41,6 +41,6 @@ setup(name='Ligandomat',
       [paste.app_factory]
       main = ligandomat:main
       [console_scripts]
-      initialize_tutorial_db = ligandomat.scripts.initializedb:main
+      initialize_ligandomat_db = ligandomat.scripts.initializedb:main
       """,
       )
