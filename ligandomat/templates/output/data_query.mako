@@ -1,15 +1,17 @@
 <%inherit file='ligandomat:templates/layout.mako'/>
 <html >
 <head>
-    <title>test</title>
+    <title>data_query</title>
     <script src="../../static/jquery-2.1.0.js"></script>
 
     <script>
+        ## Adds the selected query to the query list
         function appendCriteria() {
             $(document).ready(function () {
                         var e = document.getElementById("query");
                         var strUser = e.options[e.selectedIndex].value;
 
+                        ## Add sequence query
                         if (strUser == "sequence") {
                             if ($("#sequence").length === 0) {
                                 var element =
@@ -23,6 +25,7 @@
                                 $("tr:first").append(element);
                             }
                         }
+                        ## Add Run name query
                         else if (strUser == "run_name") {
                             if ($("#run_name").length === 0) {
                                 var element = '<tr id = "run_name" name = "run_name">' +
@@ -36,6 +39,7 @@
                                 $("tr:first").append(element);
                             }
                         }
+                        ## Add source name query
                         else if (strUser == "source_name") {
                             if ($("#source").length === 0) {
                                 var element = '<tr id = "source_name" name = "source">' +
@@ -49,6 +53,7 @@
                                 $("tr:first").append(element);
                             }
                         }
+                        ## Add organ query
                         else if (strUser == "organ") {
                             if ($("#organ").length === 0) {
                                 var element = '<tr id = "organ" name = "organ">' +
@@ -62,6 +67,7 @@
                                 $("tr:first").append(element);
                             }
                         }
+                        ## Add tissue query
                         else if (strUser == "tissue") {
                             if ($("#tissue").length === 0) {
                                 var element = '<tr id = "tissue" name = "tissue">' +
@@ -74,6 +80,7 @@
                                 $("tr:first").append(element);
                             }
                         }
+                        ## Add dignity query
                         else if (strUser == "dignity") {
                             if ($("#dignity").length === 0) {
                                 var element = '<tr id = "dignity" name = "dignity">' +
@@ -87,6 +94,7 @@
                                 $("tr:first").append(element);
                             }
                         }
+                        ## Add researcher query
                         else if (strUser == "researcher") {
                             if ($("#researcher").length === 0) {
                                 var element = '<tr id = "researcher" name = "researcher">' +
@@ -100,6 +108,7 @@
                                 $("tr:first").append(element);
                             }
                         }
+                        ## Add hla typing of the source query
                         else if (strUser == "source_hla_typing") {
                             if ($("#source_hla_typing").length === 0) {
                                 var element = '<tr id = "source_hla_typing" name = "source_hla_typing">' +
@@ -119,6 +128,7 @@
             )
         }
 
+        ## removes the query object
         function removeCriteria(selected_id) {
             $('[id^="' + selected_id + '"]').remove()
         }
@@ -130,10 +140,13 @@
 </head>
 
 <body>
+<!-- Empty table which is filled with query options -->
 <table style="width:500px" id="ul_navigation">
     <tr></tr>
 
 </table>
+
+<!-- Select a query option menu -->
 <table>
     <tr><td>
 <select id="query" style="font-size:14px" name="query">
@@ -147,16 +160,20 @@
     <option value="source_hla_typing">Source hla typing</option>
 
 </select></td><td>
+<!-- Add button. Uses the appendCriteria() js function-->
 <input type="image" src="../../static/plus.png" height="22" onclick="appendCriteria()">
     </td>
 <td width ="150"></td>
 <td>
+<!-- Starts the query -->
     <input style="font-size:14px" value="Search Database" type="submit" name="search" >
 </td>
 
     </tr>
 </table>
 <br><br>
+
+<!-- Filter criteria -->
 <hr width="100%"><br>
 <table style="width:400px" id="filter_list">
 <tr><td><b>Filter:</b></td></tr>
