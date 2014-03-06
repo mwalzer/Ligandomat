@@ -1,4 +1,5 @@
 <%inherit file='ligandomat:templates/layout.mako'/>
+
 <html >
 <head>
     <title>data_query</title>
@@ -15,10 +16,14 @@
                         if (strUser == "sequence") {
                             if ($("#sequence").length === 0) {
                                 var element =
+
                                         '<tr id = "sequence" name = "sequence">' +
+                                         '<form>'+
+
 
                                                 '<td>Sequence:</td> '+
                                         '<td><input style="font-size:14px" name="sequence" type="text" /></td>' +
+                                         '</form>'+
 
                                         '<td><input type="image" src="../../static/minus.png" height="22" id = "sequence" onclick=removeCriteria("sequence")></td>' +
                                 '</tr>';
@@ -140,6 +145,7 @@
 </head>
 
 <body>
+<fieldset>
 <!-- Empty table which is filled with query options -->
 <table style="width:500px" id="ul_navigation">
     <tr></tr>
@@ -165,16 +171,21 @@
     </td>
 <td width ="150"></td>
 <td>
+<form method="post" action=query name="query">
 <!-- Starts the query -->
     <input style="font-size:14px" value="Search Database" type="submit" name="search" >
+</form>
+
+
 </td>
 
     </tr>
 </table>
+    </fieldset>
 <br><br>
 
 <!-- Filter criteria -->
-<hr width="100%"><br>
+<fieldset>
 <table style="width:400px" id="filter_list">
 <tr><td><b>Filter:</b></td></tr>
 <tr><td>Ion score </td><td>< </td> <td><input style="font-size:14px" name="ionscore" type="text" value="20" /></td></tr>
@@ -185,9 +196,7 @@
 
 
 </table>
-
-
-
+    </fieldset>
 </body>
 </html>
 

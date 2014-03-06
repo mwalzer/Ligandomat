@@ -1,14 +1,14 @@
 __author__ = 'Backert'
 """File contains queries strings:
 
- - search_by_subsequence
+ - search_by_sequence_first
  - search_all
  - search_by_runname
  - search_by_organ
  - search_by_tissue
 """
 
-search_by_subsequence = """	SELECT
+search_by_sequence_first = """		SELECT
     sequence,
     sourcename,
     GROUP_CONCAT(DISTINCT gene_group
@@ -31,57 +31,50 @@ FROM
     (SELECT
         *
     FROM
-        (SELECT
+        ((SELECT
+        sequence,
+		peptide_id
+    FROM
+        peptide
+	'%s')pep_select
+    INNER JOIN (SELECT
         ms_run_ms_run_id as peptidems_id,
             sequence,
             RT,
             MZ,
             ionscore,
-            e_value
+            e_value,
+			peptide_peptide_id
     FROM
         spectrum_hit
-    INNER JOIN (SELECT
-        *
-    FROM
-        peptide
-    WHERE
-        sequence LIKE '%s')pep_select ON pep_select.peptide_id = peptide_peptide_id WHERE ionscore >19 AND e_value<1)  peptide
-    INNER JOIN (SELECT
+	'%s') spectrum_hits  ON pep_select.peptide_id = spektrum_hits.peptide_peptide_id )  peptide
+    INNER JOIN ((SELECT
         ms_run_id,
             source_source_id as mssource_id,
             filename as runname,
-            antibody_set,
-            sample_mass,
-            sample_volume
+            antibody_set
     FROM
         ms_run
+	'%s') ms_runs
     INNER JOIN mhcpraep ON mhcpraep_mhcpraep_id = mhcpraep_id) ms ON ms_run_id = peptidems_id) peprun
         INNER JOIN
-    (SELECT
+    ((SELECT
         source_id,
             name as sourcename,
             organ,
             tissue,
-            dignity,
-            typing_source_id,
-            gene_group,
-            specific_protein,
-            dna_coding,
-            dna_noncoding,
-            expression_suffix
+            dignity
     FROM
         source
+	'%s'
+	)sources
     INNER JOIN (SELECT
-        source_source_id as typing_source_id,
-            gene_group,
-            specific_protein,
-            dna_coding,
-            dna_noncoding,
-            expression_suffix
+        source_source_id as typing_source_id
+
     FROM
         source_hlatyping
-    INNER JOIN hlaallele ON hlaallele_hlaallele_id = hlaallele_id) typing ON source_id = typing_source_id) source ON source_id = mssource_id
-GROUP BY sourcename ORDER BY %s ASC
+    INNER JOIN hlaallele ON hlaallele_hlaallele_id = hlaallele_id) typing ON source_id = typing_source_id) source ON sources.source_id = mssource_id
+GROUP BY sourcename
 
 """
 

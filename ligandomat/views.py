@@ -22,6 +22,7 @@ from pyramid.security import (
     authenticated_userid,
 )
 from ligandomat.tools import queries
+from ligandomat.tools.queryCreator import create_query
 from .security import groupfinder
 from .forms import Source, Prep, Mass_spec, DataQuery
 from .transformer import *
@@ -114,7 +115,7 @@ def statistics_page(request):
 @view_config(route_name='data_access', renderer='ligandomat:templates/output/data_query.mako',
              match_param='action=query', permission='view')
 def access_data_query(request):
-    """"Query website and funcitonality
+    """"Query website and functionality
 
     The query-strings are in queries.py.
     Connection to the DB using MySQLdb. NOT pyramid!
@@ -126,37 +127,27 @@ def access_data_query(request):
     form.setChoices()
     session = request.session
 
-    # Getting all the parameters from the input Mako
-    pat = request.params.get('subsequence')
-    pat_sorting_by = request.params.get('sorting_pat')
-    run_pat = request.params.get('runname_subsequence')
-    runname_sorting_by = request.params.get('sorting_runname')
-    organ = request.params.get('organ_subsequence')
-    organ_sorting_by = request.params.get('sorting_organ')
-    tissue = request.params.get('tissue_subsequence')
-    tissue_sorting_by = request.params.get('sorting_tissue')
 
-    # Collecting input from Mako
-    sequence = request.params.get('sequence')
-    run_name = request.params.get('run_name')
-    source_name = request.params.get('source_name')
-    organ = request.params.get('organ')
-    tissue = request.params.get('tissue')
-    dignity = request.params.get('dignity')
-    researcher = request.params.get('researcher')
-    source_hla_typing = request.params.get('source_hla_typing')
 
-    # Collecting filters from Mako
-    ionscore = request.params.get('ionscore')
-    e_value = request.params.get('e-Value')
-    q_value = request.params.get('q-Value')
-
+    # Collecting input from Mako and creating query parts
+    query_dict = create_query(request.params)
 
 
     # Connecting to the DB using MySQLdb
     conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd, db=config.db,
                            port=config.port)
     c = conn.cursor(MySQLdb.cursors.DictCursor)
+
+    print("hullu")
+    # Use this if the sequence is a query criteria to speed up the query
+    if 'sequence' in request.params:
+        print("hallo")
+        querystring = queries.search_by_sequence_first
+        c.execute(querystring % (query_dict.get("sequence"), query_dict.get("spectrum_hit"), query_dict("run_name"), query_dict.get("source") ))
+        result = c.fetchall()
+        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
+        result = template.render(rows = result)
+        return Response(result)
 
 
     if 'search_by_subsequence' in request.params:
@@ -171,11 +162,6 @@ def access_data_query(request):
         result = template.render(rows = result)
         return Response(result)
 
-    if 'search_all' in request.params:
-        c.execute("SELECT DISTINCT sequence FROM spectrum_hit INNER JOIN peptide ON peptide_id = peptide_peptide_id")
-        result = c.fetchall()
-
-        output = template('table_all_sequences', rows=result)
 
     if 'search_by_runname' in request.params:
         querystring = queries.search_by_runname
@@ -210,120 +196,9 @@ def access_data_query(request):
         result = template.render(rows=result)
         return Response(result)
 
-    #  Old query webpage
-    # # PEPTIDE
-    # if 'button_peptide_all' in request.params:
-    #     #session['action'] = 'peptide_all'
-    #     return HTTPFound(location=request.route_url('statistics'))
-    #
-    # if 'button_peptide_info' in request.params:
-    #     session['action'] = 'peptide_info'
-    #     session['sequence'] = request.params['peptide_info']
-    #     return HTTPFound(location=request.route_url('data_access', action='output_peptides'))
-    #
-    # if 'button_peptide_pattern' in request.params:
-    #     session['action'] = 'peptide_pattern'
-    #     session['pattern'] = request.params['peptide_pattern']
-    #
-    #     return HTTPFound(location=request.route_url('data_access', action='output_peptides'))
-    #
-    # # SOURCE
-    # if 'button_source_detail' in request.params:
-    #     session['action'] = 'source_detail'
-    #     session['source'] = request.params['source_detail']
-    #     return HTTPFound(location=request.route_url('data_access', action='output_sources'))
-    #
-    # if 'button_source_peptides' in request.params:
-    #     session['action'] = 'source_peptides'
-    #     session['source'] = request.params['source_peptides']
-    #     return HTTPFound(location=request.route_url('data_access', action='output_peptides'))
-    #
-    # if 'button_get_mining_csv' in request.params:
-    #     con = Connection()
-    #     name = 'mining' + datetime.today().isoformat()[0:10] + '.csv'
-    #     con.getMiningTable(name)
-    #     return HTTPFound(location=request.route_url('Ligandomat'))
-
     # If no case was selected return to the site itself
     return dict(form=form, logged_in=authenticated_userid(request))
 
-
-# Access Data - Output -----------------------PEPTIDES---------------------------------------------------------------------------------------
-@view_config(route_name='data_access', renderer='ligandomat:templates/output/peptides.mako',
-             match_param='action=output_peptides', permission='view')
-def access_data_output_peptides(request):
-    """ Old peptide query result page. Not used anymore!"""
-
-
-
-
-
-
-    # session = request.session
-    # action = session['action']
-    #
-    # if action == 'peptide_all':
-    #     peptides = DBSession.query(Peptide).all()
-    #     table = presentData.fastPeptidesTable(DBSession, Peptide, Hit, SourceData, SourceHLA, HLAAllele, PrepData,
-    #                                           MSData, Person, peptides)
-    # if action == 'peptide_pattern':
-    #     pattern = session['pattern']
-    #     peptides = patternRec.getPatternPeptides(pattern, DBSession, Peptide)
-    #     message = 'Peptides that share the pattern %s' % pattern
-    #     table = presentData.fastPeptidesTable(DBSession, Peptide, Hit, SourceData, SourceHLA, HLAAllele, PrepData,
-    #                                           MSData, Person, peptides)
-    #
-    # if action == 'peptide_info':
-    #     sequence = session['sequence']
-    #     message = 'Information about the peptide %s' % sequence
-    #     peptide = getPeptideBySeq(DBSession, Peptide, sequence)
-    #     if peptide is None:
-    #         return Response('Sorry, this peptide could not be found in our data bank :(')
-    #     table = presentData.smallPeptidesTable(DBSession, Peptide, Hit, SourceData, SourceHLA, HLAAllele, PrepData,
-    #                                            MSData, Person, [peptide])
-    #
-    # if action == 'source_peptides':
-    #     source = getSourceFromCollectInt(DBSession, SourceData, int(session['source']))
-    #     message = "Peptides of source %s :" % source.name
-    #     #TODO
-    #     ms_runs = DBSession.query(MSData.ms_run_id).filter(MSData.source_source_id == source.source_id).all()
-    #     hits = DBSession.query(Hit.peptide_peptide_id).filter(Hit.ms_run_ms_run_id in ms_runs).all()
-    #     print hits
-    #     return Response("bla")
-    #     peptides = DBSession.query(Peptide).get(Peptide.peptide_id in hits)
-    #     table = presentData.smallPeptidesTable(DBSession, Peptide, Hit, SourceData, SourceHLA, HLAAllele, PrepData,
-    #                                            MSData, Person, peptides)
-    #
-    #     return dict(logged_in=authenticated_userid(request),
-    #                 message=message,
-    #                 table=table)
-
-    #session.invalidate()
-
-
-    return dict(logged_in=authenticated_userid(request),
-                message=message,
-                table=table)
-
-
-# Access Data - Output -----------------------SOURCE---------------------------------------------------------------------------------------
-@view_config(route_name='data_access', renderer='ligandomat:templates/output/sources.mako',
-             match_param='action=output_sources', permission='view')
-def access_data_output_source(request):
-    """ Old source query result page. Not used anymore!"""
-    session = request.session
-    action = session['action']
-
-    if action == 'source_detail':
-        source = getSourceFromCollectInt(DBSession, SourceData, int(session['source']))
-        message = 'Information about the requested source %s' % source.name
-        if 'button_change_source' in request.params:
-            session['fyi'] = 'One job... Only one job...'
-            session['image'] = 'onejob'
-            return HTTPFound(location=request.route_url('fyi'))
-        return dict(logged_in=authenticated_userid(request),
-                    message=message,
-                    table=SourceData.stringIt(source))
 
 
 # Forbidden View
