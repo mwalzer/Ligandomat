@@ -109,6 +109,14 @@ def statistics_page(request):
                 seqs=seqs,
                 nSeqs=len(seqs)
     )
+    
+# Download Query
+@view_config(route_name='data_access', match_param="action=ligandomat_output.xls", renderer='ligandomat:templates/output/table_all_infos.mako', permission='view')
+def download(request):
+    if 'download_xls' in request.params:
+        filename = authenticated_userid(request) + '.xls'
+        response = FileResponse(filename, request=request, content_type='application/msexcel')
+        return response
 
 
 # Access Data - Query---------------------------------------------------------------------------------------------------------------
@@ -150,26 +158,43 @@ def access_data_query(request):
         return Response(result)
 
 
-    if 'search_by_subsequence' in request.params:
+   if 'search_by_subsequence' in request.params:
         searchstring = pat
         querystring = queries.search_by_subsequence
-
         c.execute(querystring % (searchstring, pat_sorting_by))
         result = c.fetchall()
+        header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+        filename = authenticated_userid(request) + '.xls'
+        if os.path.isfile(filename) == 1 :
+            os.remove(filename)
+        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
         #result = database_prediction(result)
         #result = annotate(result)
         template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
         result = template.render(rows = result)
         return Response(result)
 
+    if 'search_all' in request.params:
+        c.execute("SELECT DISTINCT sequence FROM spectrum_hit INNER JOIN peptide ON peptide_id = peptide_peptide_id")
+        result = c.fetchall()
+
+        template = Template(filename='./ligandomat/templates/output/table_all_sequences.mako')
+        result = template.render(rows=result)
+        return Response(result)
 
     if 'search_by_runname' in request.params:
         querystring = queries.search_by_runname
         c.execute(querystring % (run_pat, runname_sorting_by))
         result = c.fetchall()
+        header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+        filename = authenticated_userid(request) + '.xls'
+        if os.path.isfile(filename) == 1 :
+            os.remove(filename)
+        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
         #	result = database_prediction(result)
         #result = annotate(result)
         #output = template('table_run_query', rows=result)
+        #TODO: WHy is the query here different to the others? The output should be the same?
         template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
         result = template.render(rows=result)
         return Response(result)
@@ -178,6 +203,11 @@ def access_data_query(request):
         querystring = queries.search_by_organ
         c.execute(querystring % (organ, organ_sorting_by))
         result = c.fetchall()
+        header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+        filename = authenticated_userid(request) + '.xls'
+        if os.path.isfile(filename) == 1 :
+            os.remove(filename)
+        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
         #result = database_prediction(result)
         #result = annotate(result)
         #output = template('table_all_infos', rows=result)
@@ -189,6 +219,11 @@ def access_data_query(request):
         querystring = queries.search_by_tissue
         c.execute(querystring % (tissue, tissue_sorting_by))
         result = c.fetchall()
+        header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+        filename = authenticated_userid(request) + '.xls'
+        if os.path.isfile(filename) == 1 :
+            os.remove(filename)
+        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
         #result = database_prediction(result)
         #result = annotate(result)
         #output = template('table_all_infos', rows=result)
