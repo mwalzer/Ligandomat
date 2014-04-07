@@ -1,15 +1,7 @@
 import os
-import shutil
-import re
 import hashlib
-from sqlalchemy import and_
-from docutils.core import publish_parts
-
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import *
 
 from mako.template import Template
-from pyramid.response import Response
 
 from pyramid.response import Response
 from pyramid.view import (
@@ -23,19 +15,12 @@ from pyramid.security import (
 )
 from ligandomat.tools import queries
 from ligandomat.tools.queryCreator import create_query
-from .security import groupfinder
-from .forms import Source, Prep, Mass_spec, DataQuery
-from .transformer import *
+from tools.XlsDictAdapter import XlsDictReader, XlsDictWriter
+from .forms import DataQuery
 from pyramid.httpexceptions import HTTPFound
-from sqlalchemy.exc import DBAPIError
 from .models import *
-from datetime import *
 
-from DBtransfer import *
 from run_list_handling import *
-from tools import reader, patternRec
-import tools
-import presentData
 
 # Index Page ----------------------------------------------------------------------------------------------------------
 @view_config(route_name='home', renderer='ligandomat:templates/index.mako', permission='view')
@@ -129,107 +114,46 @@ def access_data_query(request):
     Connection to the DB using MySQLdb. NOT pyramid!
     """
 
-
-
     form = DataQuery(request.POST)
     form.setChoices()
-    session = request.session
-
-
-
-    # Collecting input from Mako and creating query parts
-    query_dict = create_query(request.params)
-
 
     # Connecting to the DB using MySQLdb
     conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd, db=config.db,
                            port=config.port)
     c = conn.cursor(MySQLdb.cursors.DictCursor)
 
-    print("hullu")
-    # Use this if the sequence is a query criteria to speed up the query
-    if 'sequence' in request.params:
-        print("hallo")
-        querystring = queries.search_by_sequence_first
-        c.execute(querystring % (query_dict.get("sequence"), query_dict.get("spectrum_hit"), query_dict("run_name"), query_dict.get("source") ))
-        result = c.fetchall()
-        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows = result)
-        return Response(result)
+
+    if "search" in request.params:
+        # Collecting input from Mako and creating query parts
+        search_dict = ast.literal_eval(request.params.get("search"))
+        query_dict = create_query(search_dict)
+        # Use this if the sequence is a query criteria to speed up the query
+        if 'sequence_input' in search_dict.keys():
+            querystring = queries.search_by_sequence_first
+            #TODO: Still need to implement!
+            c.execute(querystring % (query_dict["peptide"], query_dict["spectrum_hit"], query_dict["ms_run"], query_dict["source"]))  #TODO: source_name, person, source_hla_typing
+            result = c.fetchall()
+            template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
+            result = template.render(rows = result)
+            return Response(result)
 
 
-   if 'search_by_subsequence' in request.params:
-        searchstring = pat
-        querystring = queries.search_by_subsequence
-        c.execute(querystring % (searchstring, pat_sorting_by))
-        result = c.fetchall()
-        header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
-        filename = authenticated_userid(request) + '.xls'
-        if os.path.isfile(filename) == 1 :
-            os.remove(filename)
-        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
-        #result = database_prediction(result)
-        #result = annotate(result)
-        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows = result)
-        return Response(result)
+        if 'search_by_subsequence' in request.params:
+            searchstring = pat
+            querystring = queries.search_by_subsequence
+            c.execute(querystring % (searchstring, pat_sorting_by))
+            result = c.fetchall()
+            header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+            filename = authenticated_userid(request) + '.xls'
+            if os.path.isfile(filename) == 1 :
+                os.remove(filename)
+            XlsDictWriter(filename, result, headerlist=header)
+            #result = database_prediction(result)
+            #result = annotate(result)
+            template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
+            result = template.render(rows = result)
+            return Response(result)
 
-    if 'search_all' in request.params:
-        c.execute("SELECT DISTINCT sequence FROM spectrum_hit INNER JOIN peptide ON peptide_id = peptide_peptide_id")
-        result = c.fetchall()
-
-        template = Template(filename='./ligandomat/templates/output/table_all_sequences.mako')
-        result = template.render(rows=result)
-        return Response(result)
-
-    if 'search_by_runname' in request.params:
-        querystring = queries.search_by_runname
-        c.execute(querystring % (run_pat, runname_sorting_by))
-        result = c.fetchall()
-        header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
-        filename = authenticated_userid(request) + '.xls'
-        if os.path.isfile(filename) == 1 :
-            os.remove(filename)
-        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
-        #	result = database_prediction(result)
-        #result = annotate(result)
-        #output = template('table_run_query', rows=result)
-        #TODO: WHy is the query here different to the others? The output should be the same?
-        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows=result)
-        return Response(result)
-
-    if 'search_by_organ' in request.params:
-        querystring = queries.search_by_organ
-        c.execute(querystring % (organ, organ_sorting_by))
-        result = c.fetchall()
-        header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
-        filename = authenticated_userid(request) + '.xls'
-        if os.path.isfile(filename) == 1 :
-            os.remove(filename)
-        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
-        #result = database_prediction(result)
-        #result = annotate(result)
-        #output = template('table_all_infos', rows=result)
-        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows=result)
-        return Response(result)
-
-    if 'search_by_tissue' in request.params:
-        querystring = queries.search_by_tissue
-        c.execute(querystring % (tissue, tissue_sorting_by))
-        result = c.fetchall()
-        header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
-        filename = authenticated_userid(request) + '.xls'
-        if os.path.isfile(filename) == 1 :
-            os.remove(filename)
-        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
-        #result = database_prediction(result)
-        #result = annotate(result)
-        #output = template('table_all_infos', rows=result)
-        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows=result)
-        return Response(result)
 
     # If no case was selected return to the site itself
     return dict(form=form, logged_in=authenticated_userid(request))

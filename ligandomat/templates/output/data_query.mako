@@ -1,11 +1,29 @@
 <%inherit file='ligandomat:templates/layout.mako'/>
 
-<html >
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <title>data_query</title>
     <script src="../../static/jquery-2.1.0.js"></script>
 
     <script>
+
+        ## Combines all query inputs
+        function combine_query(){
+            var element_values = ["sequence_input","run_name_input","source_name_input","organ_input","tissue_input",
+                                  "dignity_input","researcher_input","source_hla_typing_input","ionscore_input",
+                                  "e_value_input","q_value_input"];
+            var values_string = "{";
+            for (var i=0;i<element_values.length;i++)
+                if (document.getElementById(element_values[i])!=null){
+                    values_string = values_string+"'"+element_values[i]+"':'"+document.getElementById(element_values[i]).value+"',";
+            }
+            values_string = values_string.substring(0, values_string.length - 1)
+            document.getElementById("search").value =  values_string+"}";
+
+
+        }
+
+
         ## Adds the selected query to the query list
         function appendCriteria() {
             $(document).ready(function () {
@@ -22,7 +40,7 @@
 
 
                                                 '<td>Sequence:</td> '+
-                                        '<td><input style="font-size:14px" name="sequence" type="text" /></td>' +
+                                        '<td><input style="font-size:14px" name="sequence" id="sequence_input" type="text" /></td>' +
                                          '</form>'+
 
                                         '<td><input type="image" src="../../static/minus.png" height="22" id = "sequence" onclick=removeCriteria("sequence")></td>' +
@@ -37,9 +55,9 @@
                                         '<td>Runname: </td>'+
 
 
-                                        '<td><input style="font-size:14px" name="run_name" type="text" /></td>' +
+                                        '<td><input style="font-size:14px" id = "run_name_input" name="run_name" type="text" /></td>' +
 
-                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "run_name" onclick=removeCriteria("run_name")></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("run_name")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -51,9 +69,9 @@
                                         '<td>Source name: </td>'+
 
 
-                                        '<td><input style="font-size:14px" name="source_name" type="text" /></td>' +
+                                        '<td><input style="font-size:14px" id = "source_name_input" name="source_name" type="text" /></td>' +
 
-                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "source_name" onclick=removeCriteria("source_name")></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("source_name")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -65,9 +83,9 @@
                                         '<td>Organ: </td>'+
 
 
-                                        '<td><input style="font-size:14px" name="organ" type="text" /></td>' +
+                                        '<td><input style="font-size:14px" id = "organ_input" name="organ" type="text" /></td>' +
 
-                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "organ" onclick=removeCriteria("organ")></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("organ")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -78,9 +96,9 @@
                                 var element = '<tr id = "tissue" name = "tissue">' +
                                         '<td>Tissue: </td>'+
 
-                                        '<td><input style="font-size:14px" name="tissue" type="text" /></td>' +
+                                        '<td><input style="font-size:14px"  id = "tissue_input" name="tissue" type="text" /></td>' +
 
-                                        '<td><input type="image" src="../../static/minus.png" height="22" id = "tissue" onclick=removeCriteria("tissue")></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22" onclick=removeCriteria("tissue")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -92,9 +110,9 @@
                                         '<td>Dignity: </td>'+
 
 
-                                        '<td><input style="font-size:14px" name="dignity" type="text" /></td>' +
+                                        '<td><input style="font-size:14px"  id = "dignity_input" name="dignity" type="text" /></td>' +
 
-                                        '<td><input type="image" src="../../static/minus.png" height="22"  id = "dignity" onclick=removeCriteria("dignity")></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("dignity")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -106,9 +124,9 @@
                                         '<td>Researcher: </td>'+
 
 
-                                        '<td><input style="font-size:14px" name="researcher" type="text" /></td>' +
+                                        '<td><input style="font-size:14px" id = "researcher_input" name="researcher" type="text" /></td>' +
 
-                                        '<td><input type="image" src="../../static/minus.png" height="22"  id = "researcher" onclick=removeCriteria("researcher")></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"   onclick=removeCriteria("researcher")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -120,9 +138,9 @@
                                         '<td>Source hla typing: </td>'+
 
 
-                                        '<td><input style="font-size:14px" name="source_hla_typing" type="text" /></td>' +
+                                        '<td><input style="font-size:14px"  id = "source_hla_typing_input" name="source_hla_typing" type="text" /></td>' +
 
-                                        '<td><input type="image" src="../../static/minus.png" height="22"  id = "source_hla_typing" onclick=removeCriteria("source_hla_typing")></td>' +
+                                        '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("source_hla_typing")></td>' +
                                         '</tr>';
                                 $("tr:first").append(element);
                             }
@@ -170,12 +188,13 @@
 <input type="image" src="../../static/plus.png" height="22" onclick="appendCriteria()">
     </td>
 <td width ="150"></td>
-<td>
-<form method="post" action=query name="query">
-<!-- Starts the query -->
-    <input style="font-size:14px" value="Search Database" type="submit" name="search" >
-</form>
 
+
+<td>
+    <form method="post" action=query name="query">
+<!-- Starts the query -->
+    <input style="font-size:14px" value = "Search Database" onclick = "combine_query()"  id="search" type="submit" name="search" >
+        </form>
 
 </td>
 
@@ -188,15 +207,16 @@
 <fieldset>
 <table style="width:400px" id="filter_list">
 <tr><td><b>Filter:</b></td></tr>
-<tr><td>Ion score </td><td>< </td> <td><input style="font-size:14px" name="ionscore" type="text" value="20" /></td></tr>
+<tr><td>Ion score </td><td>< </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" type="text" value="20" /></td></tr>
 
-<tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" name="e-Value" type="text" value="1"/></td></tr>
+<tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" id="e_value_input" name="e-Value" type="text" value="1"/></td></tr>
 
-<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" name="q-Value" type="text" value="1" /></td></tr>
+<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" type="text" value="1" /></td></tr>
 
 
 </table>
     </fieldset>
 </body>
 </html>
+
 

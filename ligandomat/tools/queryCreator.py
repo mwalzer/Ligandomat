@@ -1,80 +1,80 @@
 __author__ = 'linus'
 
 
-
-def create_query(params):
+def create_query(search_dict):
     """ Creates a query parts dictionary
 
-        Dict contains:
-            sequence
-            run_name
-            source_name
-            source (organ/tissue/dignity)
-            researcher
-            source_hla_typing (TODO)
-            spectrum_hit (ionscore, e-value, q-value)
+    :search_dict search_dict:
+
+    Dict contains:
+        peptide
+        ms_run
+        source_name
+        source (organ/tissue/dignity)
+        person
+        source_hla_typing (TODO)
+        spectrum_hit (ionscore, e-value, q-value)
         """
     query_dict = dict()
-
     # Sequence
-    if "sequence" in params:
-        query_dict["peptide"] = "WHERE sequence LIKE "+params.get("sequence")
+    if "sequence_input" in search_dict.keys():
+        query_dict["peptide"] = "WHERE sequence LIKE '"+search_dict["sequence_input"]+"'"
     else:
         query_dict["peptide"] = ""
 
     # Run name
-    if "run_name" in params:
-        query_dict["ms_run"] = "WHERE filename LIKE "+params.get("run_name")
+    if "run_name_input" in search_dict.keys():
+        query_dict["ms_run"] = "WHERE filename LIKE '"+search_dict["run_name_input"]+"'"
     else:
         query_dict["ms_run"] = ""
 
     # Source name
-    if "source_name" in params:
-        query_dict["source_name"] = "WHERE name LIKE "+params.get("source_name")
+    if "source_name_input" in search_dict.keys():
+        query_dict["source_name"] = "WHERE name LIKE '"+search_dict["source_name_input"]+"'"
     else:
         query_dict["source_name"] = ""
 
     # Source
     where_set = False
-    if "source_name" in params:
-        query_dict["source"] = "WHERE name LIKE " + params.get("source_name")
+    if "source_name_input" in search_dict.keys():
+        query_dict["source"] = "WHERE name LIKE '" + search_dict["source_name_input"]+"'"
         where_set = True
 
-    if "organ" in params:
+    if "organ_input" in search_dict.keys():
         if where_set:
-            query_dict["source"] = query_dict["source"]+"AND organ LIKE "+params.get("organ")
+            query_dict["source"] = query_dict["source"]+"AND organ LIKE '"+search_dict["organ_input"]+"'"
         else:
-           query_dict["source"] = "WHERE organ LIKE "+params.get("organ")
+            query_dict["source"] = "WHERE organ LIKE '"+search_dict["organ_input"]+"'"
 
-    if "tissue" in params:
+    if "tissue_input" in search_dict.keys():
         if where_set:
-            query_dict["source"] = query_dict["source"]+"AND tissue LIKE "+params.get("tissue")
+            query_dict["source"] = query_dict["source_input"]+"AND tissue LIKE '"+search_dict["tissue_input"]+"'"
         else:
-           query_dict["source"] = "WHERE tissue LIKE "+params.get("tissue")
+            query_dict["source"] = "WHERE tissue LIKE '"+search_dict["tissue_input"]+"'"
 
-    if "dignity" in params:
+    if "dignity_input" in search_dict.keys():
         if where_set:
-            query_dict["source"] = query_dict["tissue"]+"AND dignity LIKE "+params.get("dignity")
+            query_dict["source"] = query_dict["tissue_input"]+"AND dignity LIKE '"+search_dict["dignity_input"]+"'"
         else:
-           query_dict["source"] = "WHERE dignity LIKE "+params.get("dignity")
+            query_dict["source"] = "WHERE dignity LIKE '"+search_dict["dignity_input"]+"'"
     if not where_set:
         query_dict["source"] = ""
 
     # Researcher
-    if "researcher" in params:
-        query_dict["person"] = "WHERE lastname LIKE "+params.get("researcher")
+    if "researcher_input" in search_dict.keys():
+        query_dict["person"] = "WHERE lastname LIKE '"+search_dict["researcher_input"]+"'"
     else:
         query_dict["person"] = ""
 
     # Source HLA typing
-    if "source_hla_typing" in params:
+    if "source_hla_typing_input" in search_dict.keys():
         query_dict["source_hla_typing"] = ""
         #TODO :queryDict["source_hla_typing"] = "source_hla_typing organ LIKE"+params.get("source_hla_typing")
     else:
         query_dict["source_hla_typing"] = ""
 
-    query_dict["spectrum_hit"] = "WHERE ionscore > " + str(params.get("ion_score")) + " AND e_value < " \
-                                 + str(params.get("e-value")) + " AND q_value < " + str(params.get("q-value"))
+    query_dict["spectrum_hit"] = "WHERE ionscore > " + str(search_dict["ionscore_input"]) + " AND e_value < " \
+                                 + str(search_dict["e_value_input"]) + " AND q_value < " + str(search_dict["q_value_input"])
 
 
 
