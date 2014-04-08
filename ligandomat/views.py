@@ -15,12 +15,13 @@ from pyramid.security import (
 )
 from ligandomat.tools import queries
 from ligandomat.tools.queryCreator import create_query
-from tools.XlsDictAdapter import XlsDictReader, XlsDictWriter
+from ligandomat.tools import XlsDictAdapter
 from .forms import DataQuery
 from pyramid.httpexceptions import HTTPFound
 from .models import *
 
 from run_list_handling import *
+from pyramid.response import FileResponse
 
 # Index Page ----------------------------------------------------------------------------------------------------------
 @view_config(route_name='home', renderer='ligandomat:templates/index.mako', permission='view')
@@ -126,16 +127,24 @@ def access_data_query(request):
     if "search" in request.params:
         # Collecting input from Mako and creating query parts
         search_dict = ast.literal_eval(request.params.get("search"))
-        query_dict = create_query(search_dict)
+        querystring = queries.search_query_new + create_query(search_dict)
+        print querystring
+        c.execute(querystring)
+        result = c.fetchall()
+
+        # Write ouput
+        header = ['sequence', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ', 'minScore', 'maxScore', 'minE', 'maxE', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+        filename = "hardcoded_filename.xls"#authenticated_userid(request) + '.xls'
+        if os.path.isfile(filename) == 1:
+            os.remove(filename)
+        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+
+        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
+        result = template.render(rows = result)
+        return Response(result)
         # Use this if the sequence is a query criteria to speed up the query
-        if 'sequence_input' in search_dict.keys():
-            querystring = queries.search_by_sequence_first
-            #TODO: Still need to implement!
-            c.execute(querystring % (query_dict["peptide"], query_dict["spectrum_hit"], query_dict["ms_run"], query_dict["source"]))  #TODO: source_name, person, source_hla_typing
-            result = c.fetchall()
-            template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-            result = template.render(rows = result)
-            return Response(result)
+        """
+
 
 
         if 'search_by_subsequence' in request.params:
@@ -153,6 +162,7 @@ def access_data_query(request):
             template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
             result = template.render(rows = result)
             return Response(result)
+            """
 
 
     # If no case was selected return to the site itself

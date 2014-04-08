@@ -1,4 +1,4 @@
-
+## TODO: Limit ouptput table
 
     <form action="ligandomat_output.xls" method="post">
 
@@ -35,14 +35,14 @@
                     <td> -</td>
                     <td> ${row['sourcename']} </td>
                     <td> ${row['hlatype']} </td>
-                    <td> ${row['min_RT']} </td>
-                    <td> ${row['max_RT']} </td>
-                    <td> ${row['min_MZ']} </td>
-                    <td> ${row['max_MZ']} </td>
-                    <td> ${row['min_Score']} </td>
-                    <td> ${row['max_Score']} </td>
-                    <td> ${row['min_Evalue']} </td>
-                    <td> ${row['max_Evalue']} </td>
+                    <td> ${row['minRT']} </td>
+                    <td> ${row['maxRT']} </td>
+                    <td> ${row['minMZ']} </td>
+                    <td> ${row['maxMZ']} </td>
+                    <td> ${row['minScore']} </td>
+                    <td> ${row['maxScore']} </td>
+                    <td> ${row['minE']} </td>
+                    <td> ${row['maxE']} </td>
                     <td> ${row['runnames']} </td>
                     <td> ${row['antibody_set']} </td>
                     <td> ${row['organ']} </td>
