@@ -207,7 +207,7 @@
 <fieldset>
 <table style="width:400px" id="filter_list">
 <tr><td><b>Filter:</b></td></tr>
-<tr><td>Ion score </td><td>< </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" type="text" value="20" /></td></tr>
+<tr><td>Ion score </td><td>> </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" type="text" value="20" /></td></tr>
 
 <tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" id="e_value_input" name="e-Value" type="text" value="1"/></td></tr>
 

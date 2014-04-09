@@ -134,7 +134,7 @@ def access_data_query(request):
 
         # Write ouput
         header = ['sequence', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ', 'minScore', 'maxScore', 'minE', 'maxE', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
-        filename = "hardcoded_filename.xls"#authenticated_userid(request) + '.xls'
+        filename = authenticated_userid(request) + '.xls'
         if os.path.isfile(filename) == 1:
             os.remove(filename)
         XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)

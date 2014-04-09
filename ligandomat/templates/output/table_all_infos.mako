@@ -28,8 +28,10 @@
             </tr>
             </thead>
 
-            % for row in rows:
-
+            % for key, row in enumerate(rows):
+                % if key == 1000:
+                    <% return %>
+                % endif
                 <tr align="center" valign="middle">
                     <td>${row['sequence']}</td>
                     <td> -</td>

@@ -71,7 +71,7 @@ def create_query(search_dict):
     filter_string += " AND ionscore > " + str(search_dict["ionscore_input"])\
                      + " AND e_value < " + str(search_dict["e_value_input"])\
                      + " AND q_value < " + str(search_dict["q_value_input"])\
-                     + " GROUP BY sourcename"
+                     + " GROUP BY sequence"
 
     return filter_string
 

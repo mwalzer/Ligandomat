@@ -10,8 +10,8 @@ __author__ = 'Backert'
 
 search_query_new = """
 SELECT
-    sequence,
-    source.name AS sourcename,
+        sequence,
+    GROUP_CONCAT(DISTINCT source.name SEPARATOR ', ') AS sourcename,
     GROUP_CONCAT(DISTINCT gene_group
         SEPARATOR ', ') as 'hlatype',
     ROUND(MIN(RT), 2) as minRT,
@@ -25,9 +25,9 @@ SELECT
     GROUP_CONCAT(DISTINCT filename
         SEPARATOR ', ') as 'runnames',
     antibody_set,
-    organ,
-    tissue,
-    dignity,
+    GROUP_CONCAT(DISTINCT organ SEPARATOR ', ') as organ,
+    GROUP_CONCAT(DISTINCT tissue SEPARATOR ', ') as tissue,
+    GROUP_CONCAT(DISTINCT dignity SEPARATOR ', ') as dignity,
     peptide_id,
     peptide_peptide_id,
     ms_run_id,
@@ -50,6 +50,7 @@ FROM
         INNER JOIN	person ON person_id = ms_run.person_person_id
 		INNER JOIN	source_hlatyping ON source_hlatyping.source_source_id = source_id
 		INNER JOIN	hlaallele ON hlaallele_id = source_hlatyping.hlaallele_hlaallele_id
+
 
 """
 
