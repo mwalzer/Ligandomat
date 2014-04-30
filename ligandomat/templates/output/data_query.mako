@@ -8,7 +8,7 @@
 <script>
 
     ## Combines all query inputs
-        function combine_query() {
+        function combine_peptide_query() {
     var element_values = ["sequence_input", "run_name_input", "source_name_input", "organ_input", "tissue_input",
         "dignity_input", "researcher_input", "source_hla_typing_input", "ionscore_input",
         "e_value_input", "q_value_input"];
@@ -22,6 +22,41 @@
     document.getElementById("search").value = values_string + "}";
     }
 
+    function combine_run_name_source_query(){
+        if (document.getElementById("filter_list_box") != null){
+            ## Which query?
+            if (document.getElementById("search_run_name_id") != null){
+                var element_values = ["run_name", "ionscore_input","e_value_input", "q_value_input"];
+            }
+            else if (document.getElementById("search_source_id") != null){
+                var element_values = ["source", "ionscore_input","e_value_input", "q_value_input"];
+            }
+            ## Get the items
+            var values_string = "{";
+            for (var i = 0; i < element_values.length; i++){
+                if (document.getElementById(element_values[i]) != null) {
+                   values_string = values_string + "'" + element_values[i] + "':'" + document.getElementById(element_values[i]).value + "',";
+               }
+            }
+            ## set the values
+            if (document.getElementById("search_run_name_id") != null){
+                document.getElementById("search_run_name_id").value = values_string + "}";
+            }
+            else if (document.getElementById("search_source_id") != null){
+                document.getElementById("search_source_id").value = values_string + "}";
+            }
+        }else{
+            if (document.getElementById("run_name") != null){
+                 document.getElementById("search_run_name_id").value = document.getElementById("run_name").value;
+        }
+        if (document.getElementById("source") != null){
+                 document.getElementById("search_source_id").value = document.getElementById("source").value;
+        }
+        }
+
+
+    }
+
     function run_name_query_creator(){
         if (document.getElementById("run_name") != null){
                  document.getElementById("search_run_name_id").value = document.getElementById("run_name").value;
@@ -32,6 +67,35 @@
         if (document.getElementById("source") != null){
                  document.getElementById("search_source_id").value = document.getElementById("source").value;
         }
+    }
+
+    function add_filter(){
+    $(document).ready(function(){
+                if (document.getElementById("filter_list_box") != null) {
+                            document.getElementById("filter_list_box").remove();
+                }else{
+                    var filter_list =
+                '<fieldset id="filter_list_box">' +
+                '<table style="width:400px" id="filter_list">' +
+                '<tr><td><b>Filter:</b></td></tr>' +
+                '<tr><td>Ion score </td><td>> </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" type="text" value="20" /></td></tr>' +
+
+                '<tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" id="e_value_input" name="e-Value" type="text" value="1"/></td></tr>' +
+
+                '<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" type="text" value="1" /></td></tr>' +
+                '</table>' +
+                '</fieldset>' +
+                '</fieldset>';
+
+                $("#source_query_box").append(filter_list);
+                $("#run_name_query_box").append(filter_list);
+
+
+                }
+
+            }
+
+    )
     }
 
 
@@ -85,7 +149,7 @@
                                         '<td>' +
                                         '    <form method="post" action=query name="query">' +
                                     <!-- Starts the query -->
-                                        '    <input style="font-size:14px" value = "Search Database" onclick = "combine_query()"  id="search" type="submit" name="search" >' +
+                                        '    <input style="font-size:14px" value = "Search Database" onclick = "combine_peptide_query()"  id="search" type="submit" name="search" >' +
                                         '        </form>' +
 
                                         '</td>' +
@@ -127,8 +191,8 @@
                                         '<table> <td><tr>' +
                                         '<p style="font-size:16px"> Runname:' +
                                         '<input type="text" style="font-size:16px" id="run_name">' +
-                                        '<input  style="font-size:14px"  value="Search Database" onclick= "run_name_query_creator()" id="search_run_name_id" type="submit" name="search_run_name_name"> ' +
-                                        '<input type="checkbox" name="peptide_count" value="True"> Count peptides'+
+                                        '<input  style="font-size:14px"  value="Search Database" onclick= "combine_run_name_source_query()" id="search_run_name_id" type="submit" name="search_run_name_name"> ' +
+                                        '<input type="checkbox" name="peptide_count" value="True" onclick="add_filter()"> Count peptides'+
                                         '</p></tr></td></table>' +
                                         '</form>' +
                                         '</fieldset>';
@@ -151,8 +215,8 @@
                                         '<table> <td><tr>' +
                                         '<p style="font-size:16px"> Source:' +
                                         '<input type="text" style="font-size:16px" id="source">' +
-                                        '<input  style="font-size:14px"  value="Search Database" onclick= "source_query_creator()" id="search_source_id" type="submit" name="search_source_name"> ' +
-
+                                        '<input  style="font-size:14px"  value="Search Database" onclick= "combine_run_name_source_query()" id="search_source_id" type="submit" name="search_source_name"> ' +
+                                        '<input type="checkbox" name="peptide_count" value="True" onclick="add_filter()"> Count peptides'+
                                         '</p></tr></td></table>' +
                                         '</form>' +
 

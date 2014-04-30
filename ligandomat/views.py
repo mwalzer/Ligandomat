@@ -129,7 +129,8 @@ def access_data_query(request):
         # Collecting input from Mako and creating query parts
         search_dict = ast.literal_eval(request.params.get("search"))
         querystring = queries.search_query_new + create_query(search_dict)
-        print querystring
+
+        c.execute("SET tmp_table_size = 4096000")
         c.execute(querystring)
         result = c.fetchall()
 
@@ -147,7 +148,6 @@ def access_data_query(request):
     if "search_run_name_name" in request.params:
         if "peptide_count" not in request.params:
             querystring = queries.query_run_name_info % (request.params.get("search_run_name_name"))
-            print querystring
             c.execute(querystring)
             result = c.fetchall()
 
@@ -162,12 +162,14 @@ def access_data_query(request):
             result = template.render(rows = result)
             return Response(result)
         else:
-            querystring = queries.query_run_name_info_peptides % (request.params.get("search_run_name_name"))
+            search_dict = ast.literal_eval(request.params.get("search_run_name_name"))
+            querystring = queries.query_run_name_info_peptides % (search_dict["ionscore_input"], search_dict["e_value_input"]
+                                                                  , search_dict["q_value_input"], search_dict["run_name"])
             c.execute("SET tmp_table_size = 4096000")
             c.execute(querystring)
             result = c.fetchall()
 
-            # Write ouput
+            # Write output
             header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass', 'antibody_set', 'hlatype', 'number_of_peptides']
             filename = authenticated_userid(request) + '.xls'
             if os.path.isfile(filename) == 1:
@@ -179,21 +181,39 @@ def access_data_query(request):
             return Response(result)
 
     if "search_source_name" in request.params:
-        querystring = queries.query_source_info % (request.params.get("search_source_name"))
-        print querystring
-        c.execute(querystring)
-        result = c.fetchall()
+        if "peptide_count" not in request.params:
+            querystring = queries.query_source_info % (request.params.get("search_source_name"))
+            c.execute(querystring)
+            result = c.fetchall()
+            # Write output
+            header = ['name', 'organ', 'dignity', 'tissue', 'hlatype']
+            filename = authenticated_userid(request) + '.xls'
+            if os.path.isfile(filename) == 1:
+                os.remove(filename)
+            XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
 
-        # Write ouput
-        header = ['name', 'organ', 'dignity', 'tissue', 'hlatype']
-        filename = authenticated_userid(request) + '.xls'
-        if os.path.isfile(filename) == 1:
-            os.remove(filename)
-        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+            template = Template(filename='./ligandomat/templates/output/table_source_information.mako')
+            result = template.render(rows = result)
+            return Response(result)
+        else:
+            search_dict = ast.literal_eval(request.params.get("search_source_name"))
+            querystring = queries.query_source_info_peptides % (search_dict["ionscore_input"], search_dict["e_value_input"],
+                                                                search_dict["q_value_input"], search_dict["source"])
+            #querystring = queries.query_source_info_peptides % (request.params.get("search_source_name"))
+            c.execute("SET tmp_table_size = 4096000")
+            c.execute(querystring)
+            result = c.fetchall()
 
-        template = Template(filename='./ligandomat/templates/output/table_source_information.mako')
-        result = template.render(rows = result)
-        return Response(result)
+            # Write ouput
+            header = ['name', 'organ', 'dignity', 'tissue', 'hlatype', 'number_of_peptides']
+            filename = authenticated_userid(request) + '.xls'
+            if os.path.isfile(filename) == 1:
+                os.remove(filename)
+            XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+
+            template = Template(filename='./ligandomat/templates/output/table_source_information_peptides.mako')
+            result = template.render(rows=result)
+            return Response(result)
 
 
     # If no case was selected return to the site itself
