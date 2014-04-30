@@ -124,6 +124,7 @@ def access_data_query(request):
     c = conn.cursor(MySQLdb.cursors.DictCursor)
 
 
+
     if "search" in request.params:
         # Collecting input from Mako and creating query parts
         search_dict = ast.literal_eval(request.params.get("search"))
@@ -142,27 +143,57 @@ def access_data_query(request):
         template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
         result = template.render(rows = result)
         return Response(result)
-        # Use this if the sequence is a query criteria to speed up the query
-        """
 
-
-
-        if 'search_by_subsequence' in request.params:
-            searchstring = pat
-            querystring = queries.search_by_subsequence
-            c.execute(querystring % (searchstring, pat_sorting_by))
+    if "search_run_name_name" in request.params:
+        if "peptide_count" not in request.params:
+            querystring = queries.query_run_name_info % (request.params.get("search_run_name_name"))
+            print querystring
+            c.execute(querystring)
             result = c.fetchall()
-            header = ['sequence', 'sourcename', 'hlatype', 'min_RT', 'max_RT', 'min_MZ', 'max_MZ', 'min_Score', 'max_Score', 'min_Evalue', 'max_Evalue', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+
+            # Write ouput
+            header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass', 'antibody_set', 'hlatype']
             filename = authenticated_userid(request) + '.xls'
-            if os.path.isfile(filename) == 1 :
+            if os.path.isfile(filename) == 1:
                 os.remove(filename)
-            XlsDictWriter(filename, result, headerlist=header)
-            #result = database_prediction(result)
-            #result = annotate(result)
-            template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
+            XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+
+            template = Template(filename='./ligandomat/templates/output/table_run_information.mako')
             result = template.render(rows = result)
             return Response(result)
-            """
+        else:
+            querystring = queries.query_run_name_info_peptides % (request.params.get("search_run_name_name"))
+            c.execute("SET tmp_table_size = 4096000")
+            c.execute(querystring)
+            result = c.fetchall()
+
+            # Write ouput
+            header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass', 'antibody_set', 'hlatype', 'number_of_peptides']
+            filename = authenticated_userid(request) + '.xls'
+            if os.path.isfile(filename) == 1:
+                os.remove(filename)
+            XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+
+            template = Template(filename='./ligandomat/templates/output/table_run_information_peptides.mako')
+            result = template.render(rows = result)
+            return Response(result)
+
+    if "search_source_name" in request.params:
+        querystring = queries.query_source_info % (request.params.get("search_source_name"))
+        print querystring
+        c.execute(querystring)
+        result = c.fetchall()
+
+        # Write ouput
+        header = ['name', 'organ', 'dignity', 'tissue', 'hlatype']
+        filename = authenticated_userid(request) + '.xls'
+        if os.path.isfile(filename) == 1:
+            os.remove(filename)
+        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+
+        template = Template(filename='./ligandomat/templates/output/table_source_information.mako')
+        result = template.render(rows = result)
+        return Response(result)
 
 
     # If no case was selected return to the site itself
