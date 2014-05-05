@@ -7,11 +7,22 @@
 
 <script>
 
+    ## Help alert box
+    function help_alert(s) {
+    if (s == "select_help") {
+        alert("Please select a type of output: \n -Detailed list of peptides = Returns a table of peptides \n -Run information = Get information about your MS run \n -Source information = Get information about your source");
+    }else if (s == "filter_help"){
+        alert("The filter section avoids unsignificant hits in the results.\n\nSetting loose filter parameters results in longer computation times.");
+    }else if (s == "add_criteria_help"){
+        alert("Choose a parameter out of the list and add it.\n\nYou can combine all parameters with each other.")
+    }
+    }
+
     ## Combines all query inputs
         function combine_peptide_query() {
     var element_values = ["sequence_input", "run_name_input", "source_name_input", "organ_input", "tissue_input",
         "dignity_input", "researcher_input", "source_hla_typing_input", "ionscore_input",
-        "e_value_input", "q_value_input"];
+        "e_value_input", "q_value_input","protein_input"];
     var values_string = "{";
     for (var i = 0; i < element_values.length; i++){
         if (document.getElementById(element_values[i]) != null) {
@@ -68,6 +79,49 @@
                  document.getElementById("search_source_id").value = document.getElementById("source").value;
         }
     }
+    function toggle_usage(){
+    $(document).ready(function(){
+                if (document.getElementById("usage_box") != null) {
+                            document.getElementById("usage_box").remove();
+                }else{
+                    var usage =
+                '<fieldset id="usage_box">' +
+                '<legend>Usage:</legend>' +
+                        '<b>General usage:</b>'+
+                '<ol>' +
+                        '<li>Select the output format.</li>' +
+                        '<li>Detailed peptide list:' +
+                                '<ol>' +
+                                '<li>Choose search parameters and add these.</li>' +
+                                '<li>If you can choose between "OR" and "AND" it is possible for multiple inputs. Seperate the elemtents with a ";" (no quotes!)</li>' +
+                                '<li>All parameters can be combined.</li>' +
+                                '</ol>' +
+                        '</li>' +
+                        '<li>Run and source information:' +
+                                '<ol>' +
+                                '<li>Write your run or source into the box (Wildcards allowed)</li>' +
+                                '<li>If you select "Count peptides" please set the filter parameters.</li>' +
+                                '</ol>' +
+                        '</li>' +
+                '</ol>' +
+                        '<b>Wildcards:</b>' +
+                        '<ul>' +
+                        '<li>All non numerical parameters can be used with wildcards.</li>' +
+                        '<li>For one character use "_".</li>' +
+                        '<li>For many characters use "%".</li>' +
+                        '</ul>'+
+
+                '</fieldset>';
+
+                $("#toggle_usage_button").append(usage);
+
+
+                }
+
+            }
+
+    )
+    }
 
     function add_filter(){
     $(document).ready(function(){
@@ -76,15 +130,17 @@
                 }else{
                     var filter_list =
                 '<fieldset id="filter_list_box">' +
+                '<legend>Filter:</legend>'+
                 '<table style="width:400px" id="filter_list">' +
-                '<tr><td><b>Filter:</b></td></tr>' +
                 '<tr><td>Ion score </td><td>> </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" type="text" value="20" /></td></tr>' +
 
                 '<tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" id="e_value_input" name="e-Value" type="text" value="1"/></td></tr>' +
 
-                '<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" type="text" value="1" /></td></tr>' +
+                '<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" type="text" value="1" />' +
+                        '<button onclick="help_alert(\'filter_help\')" style="font-size:14px">?</button>'+
+                        '</td></tr>' +
                 '</table>' +
-                '</fieldset>' +
+
                 '</fieldset>';
 
                 $("#source_query_box").append(filter_list);
@@ -113,12 +169,14 @@
                             document.getElementById("run_name_query_box").remove();
                         }
                         if (document.getElementById("source_query_box") != null) {
-                        document.getElementById("source_query_box").remove();
+                            document.getElementById("source_query_box").remove();
+                        }
+                        if (document.getElementById("filter_list_box") != null) {
+                            document.getElementById("filter_list_box").remove();
                         }
 
                         var detailed_peptide_list =
-                                '<fieldset id="peptide_query_box">' +
-                                        '<fieldset id="peptide_query_box">' +
+                                '<fieldset id="peptide_query_box" style="border:0px; padding:0px;margin:0px">' +
                                     <!-- Empty table which is filled with query options --> +
                                         '<table style="width:500px" id="ul_navigation">' +
 
@@ -138,11 +196,14 @@
                                         '    <option value="dignity">Dignity</option>' +
                                         '    <option value="researcher">Researcher</option>' +
                                         '    <option value="source_hla_typing">Source hla typing</option>' +
+                                        '    <option value="protein">Protein ID</option>' +
 
                                         '</select></td><td>' +
                                     <!-- Add button. Uses the appendCriteria() js function-->
                                         '<input type="image" src="../../static/plus.png" height="22" onclick="appendCriteria()" id="append_criteria">' +
                                         '    </td>' +
+
+                                        '<td><button onclick="help_alert(\'add_criteria_help\') style="font-size:14px"">?</button></td>'+
                                         '<td width ="150"></td>' +
 
 
@@ -156,20 +217,20 @@
 
                                         '    </tr>' +
                                         '</table>' +
-                                        '    </fieldset>' +
-                                        '<br><br>' +
 
                                     <!-- Filter criteria -->
                                         '<fieldset id="filter_list_box">' +
+                                        '<legend>Filter:</legend>'+
                                         '<table style="width:400px" id="filter_list">' +
-                                        '<tr><td><b>Filter:</b></td></tr>' +
                                         '<tr><td>Ion score </td><td>> </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" type="text" value="20" /></td></tr>' +
 
                                         '<tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" id="e_value_input" name="e-Value" type="text" value="1"/></td></tr>' +
 
-                                        '<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" type="text" value="1" /></td></tr>' +
+                                        '<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" type="text" value="1" />'+
+                                        '<button onclick="help_alert(\'filter_help\')" style="font-size:14px">?</button>'+
+                                        '</td></tr>' +
                                         '</table>' +
-                                        '</fieldset>' +
+                                        '</fieldset>'+
                                         '</fieldset>';
                         ##detailed_peptide_list.insertAfter($("#query_type_box"));
                         $("#query_type_box").append(detailed_peptide_list);
@@ -186,13 +247,13 @@
                     }
 
                     if (document.getElementById("run_name_query_box") == null) {
-                        var run_name_search = '<fieldset id="run_name_query_box">' +
+                        var run_name_search = '<fieldset id="run_name_query_box"  style="border:0px; padding:0px;margin:0px">' +
                                         '<form method="post" action=query name="query_runname_name">' +
                                         '<table> <td><tr>' +
                                         '<p style="font-size:16px"> Runname:' +
                                         '<input type="text" style="font-size:16px" id="run_name">' +
                                         '<input  style="font-size:14px"  value="Search Database" onclick= "combine_run_name_source_query()" id="search_run_name_id" type="submit" name="search_run_name_name"> ' +
-                                        '<input type="checkbox" name="peptide_count" value="True" onclick="add_filter()"> Count peptides'+
+                                        '<input type="checkbox" style="font-size:14px" name="peptide_count" value="True" onclick="add_filter()"> Count peptides'+
                                         '</p></tr></td></table>' +
                                         '</form>' +
                                         '</fieldset>';
@@ -210,13 +271,13 @@
                     }
 
                     if (document.getElementById("source_query_box") == null) {
-                        var source_search = '<fieldset id="source_query_box">' +
+                        var source_search = '<fieldset id="source_query_box"  style="border:0px; padding:0px;margin:0px">' +
                                         '<form method="post" action=query name="query_source_name">' +
                                         '<table> <td><tr>' +
                                         '<p style="font-size:16px"> Source:' +
                                         '<input type="text" style="font-size:16px" id="source">' +
                                         '<input  style="font-size:14px"  value="Search Database" onclick= "combine_run_name_source_query()" id="search_source_id" type="submit" name="search_source_name"> ' +
-                                        '<input type="checkbox" name="peptide_count" value="True" onclick="add_filter()"> Count peptides'+
+                                        '<input type="checkbox" style="font-size:14px" name="peptide_count" value="True" onclick="add_filter()"> Count peptides'+
                                         '</p></tr></td></table>' +
                                         '</form>' +
 
@@ -292,6 +353,10 @@
 
 
                                 '<td><input style="font-size:14px" id = "organ_input" name="organ" type="text" /></td>' +
+                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                    '<option value="AND" selected="selected">AND</option>'+
+                                    '<option value="OR">OR</option>'+
+                                '</select>'+
 
                                 '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("organ")></td>' +
                                 '</tr>';
@@ -305,6 +370,10 @@
                                 '<td>Tissue: </td>' +
 
                                 '<td><input style="font-size:14px"  id = "tissue_input" name="tissue" type="text" /></td>' +
+                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                    '<option value="AND" selected="selected">AND</option>'+
+                                    '<option value="OR">OR</option>'+
+                                '</select>'+
 
                                 '<td><input type="image" src="../../static/minus.png" height="22" onclick=removeCriteria("tissue")></td>' +
                                 '</tr>';
@@ -319,6 +388,10 @@
 
 
                                 '<td><input style="font-size:14px"  id = "dignity_input" name="dignity" type="text" /></td>' +
+                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                    '<option value="AND" selected="selected">AND</option>'+
+                                    '<option value="OR">OR</option>'+
+                                '</select>'+
 
                                 '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("dignity")></td>' +
                                 '</tr>';
@@ -334,6 +407,7 @@
 
                                 '<td><input style="font-size:14px" id = "researcher_input" name="researcher" type="text" /></td>' +
 
+
                                 '<td><input type="image" src="../../static/minus.png" height="22"   onclick=removeCriteria("researcher")></td>' +
                                 '</tr>';
                         $("tr:first").append(element);
@@ -344,15 +418,32 @@
                     if ($("#source_hla_typing").length === 0) {
                         var element = '<tr id = "source_hla_typing" name = "source_hla_typing">' +
                                 '<td>Source hla typing: </td>' +
-
-
                                 '<td><input style="font-size:14px"  id = "source_hla_typing_input" name="source_hla_typing" type="text" /></td>' +
-
+                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                    '<option value="AND" selected="selected">AND</option>'+
+                                    '<option value="OR">OR</option>'+
+                                '</select>'+
                                 '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("source_hla_typing")></td>' +
                                 '</tr>';
                         $("tr:first").append(element);
                     }
                 }
+                    ## Add hla typing of the source query
+                        else if (strUser == "protein") {
+                    if ($("#protein").length === 0) {
+                        var element = '<tr id = "protein" name = "protein">' +
+                                '<td>Protein ID: </td>' +
+                                '<td><input style="font-size:14px"  id = "protein_input" name="protein" type="text" /></td>' +
+                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                    '<option value="AND" selected="selected">AND</option>'+
+                                    '<option value="OR">OR</option>'+
+                                '</select>'+
+                                '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("protein")></td>' +
+                                '</tr>';
+                        $("tr:first").append(element);
+                    }
+                }
+
 
 
             }
@@ -370,6 +461,7 @@
 
 <body>
 <fieldset id="query_type_box">
+    <legend>Database Query</legend>
 
     <select id="query_type" style="font-size:14px" name="query_type_name">
         <option value="detailed_peptide_list" selected="selected">Detailed list of peptides</option>
@@ -378,9 +470,12 @@
     </select>
     <input type="button" style="font-size:14px" id="query_type_selector" value="Select Type"
            onclick="select_query_type()">
+    <button onclick="help_alert('select_help')" style="font-size:14px">?</button>
 
 </fieldset>
-
+<div id="toggle_usage_button">
+<button onclick="toggle_usage()" style="font-size:14px">Usage</button>
+</div>
 </body>
 </html>
 

@@ -49,6 +49,7 @@ ${next.body()}
  float:right;
 }
 
+
 #wizard{
  position:absolute;
  margin-top: 20px;
