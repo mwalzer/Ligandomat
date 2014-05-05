@@ -14,7 +14,7 @@
     }else if (s == "filter_help"){
         alert("The filter section avoids unsignificant hits in the results.\n\nSetting loose filter parameters results in longer computation times.");
     }else if (s == "add_criteria_help"){
-        alert("Choose a parameter out of the list and add it.\n\nYou can combine all parameters with each other.")
+        alert("Choose a parameter out of the list and add it.\n\nYou can combine all parameters with each other.");
     }
     }
 
@@ -29,18 +29,19 @@
             values_string = values_string + "'" + element_values[i] + "':'" + document.getElementById(element_values[i]).value + "',";
         }
     }
-    values_string = values_string.substring(0, values_string.length - 1)
+    values_string = values_string.substring(0, values_string.length - 1);
     document.getElementById("search").value = values_string + "}";
     }
 
     function combine_run_name_source_query(){
         if (document.getElementById("filter_list_box") != null){
             ## Which query?
+            var element_values = [];
             if (document.getElementById("search_run_name_id") != null){
-                var element_values = ["run_name", "ionscore_input","e_value_input", "q_value_input"];
+                element_values = ["run_name", "ionscore_input","e_value_input", "q_value_input"];
             }
             else if (document.getElementById("search_source_id") != null){
-                var element_values = ["source", "ionscore_input","e_value_input", "q_value_input"];
+                element_values = ["source", "ionscore_input","e_value_input", "q_value_input"];
             }
             ## Get the items
             var values_string = "{";
@@ -93,7 +94,7 @@
                         '<li>Detailed peptide list:' +
                                 '<ol>' +
                                 '<li>Choose search parameters and add these.</li>' +
-                                '<li>If you can choose between "OR" and "AND" it is possible for multiple inputs. Seperate the elemtents with a ";" (no quotes!)</li>' +
+                                '<li>If you can choose between "OR" and "AND" it is possible for multiple inputs. Seperate the elements with a ";" (no quotes!)</li>' +
                                 '<li>All parameters can be combined.</li>' +
                                 '</ol>' +
                         '</li>' +
@@ -203,7 +204,7 @@
                                         '<input type="image" src="../../static/plus.png" height="22" onclick="appendCriteria()" id="append_criteria">' +
                                         '    </td>' +
 
-                                        '<td><button onclick="help_alert(\'add_criteria_help\') style="font-size:14px"">?</button></td>'+
+                                        '<td><button onclick="help_alert(\'add_criteria_help\')" style="font-size:14px">?</button></td>'+
                                         '<td width ="150"></td>' +
 
 
@@ -245,7 +246,6 @@
                     if (document.getElementById("source_query_box") != null) {
                         document.getElementById("source_query_box").remove();
                     }
-
                     if (document.getElementById("run_name_query_box") == null) {
                         var run_name_search = '<fieldset id="run_name_query_box"  style="border:0px; padding:0px;margin:0px">' +
                                         '<form method="post" action=query name="query_runname_name">' +
@@ -298,11 +298,11 @@
     $(document).ready(function () {
                 var e = document.getElementById("query");
                 var strUser = e.options[e.selectedIndex].value;
-
+                var element = "";
                 ## Add sequence query
                         if (strUser == "sequence") {
-                    if ($("#sequence").length === 0) {
-                        var element =
+                    if ($("#sequence").length == 0) {
+                        element =
 
                                 '<tr id = "sequence" name = "sequence">' +
                                         '<form>' +
@@ -319,8 +319,8 @@
                 }
                     ## Add Run name query
                         else if (strUser == "run_name") {
-                    if ($("#run_name").length === 0) {
-                        var element = '<tr id = "run_name" name = "run_name">' +
+                    if ($("#run_name").length == 0) {
+                        element = '<tr id = "run_name" name = "run_name">' +
                                 '<td>Runname: </td>' +
 
 
@@ -333,8 +333,8 @@
                 }
                     ## Add source name query
                         else if (strUser == "source_name") {
-                    if ($("#source").length === 0) {
-                        var element = '<tr id = "source_name" name = "source">' +
+                    if ($("#source").length == 0) {
+                        element = '<tr id = "source_name" name = "source">' +
                                 '<td>Source name: </td>' +
 
 
@@ -347,8 +347,8 @@
                 }
                     ## Add organ query
                         else if (strUser == "organ") {
-                    if ($("#organ").length === 0) {
-                        var element = '<tr id = "organ" name = "organ">' +
+                    if ($("#organ").length == 0) {
+                        element = '<tr id = "organ" name = "organ">' +
                                 '<td>Organ: </td>' +
 
 
@@ -365,8 +365,8 @@
                 }
                     ## Add tissue query
                         else if (strUser == "tissue") {
-                    if ($("#tissue").length === 0) {
-                        var element = '<tr id = "tissue" name = "tissue">' +
+                    if ($("#tissue").length == 0) {
+                        element = '<tr id = "tissue" name = "tissue">' +
                                 '<td>Tissue: </td>' +
 
                                 '<td><input style="font-size:14px"  id = "tissue_input" name="tissue" type="text" /></td>' +
@@ -382,8 +382,8 @@
                 }
                     ## Add dignity query
                         else if (strUser == "dignity") {
-                    if ($("#dignity").length === 0) {
-                        var element = '<tr id = "dignity" name = "dignity">' +
+                    if ($("#dignity").length == 0) {
+                        element = '<tr id = "dignity" name = "dignity">' +
                                 '<td>Dignity: </td>' +
 
 
@@ -400,8 +400,8 @@
                 }
                     ## Add researcher query
                         else if (strUser == "researcher") {
-                    if ($("#researcher").length === 0) {
-                        var element = '<tr id = "researcher" name = "researcher">' +
+                    if ($("#researcher").length == 0) {
+                        element = '<tr id = "researcher" name = "researcher">' +
                                 '<td>Researcher: </td>' +
 
 
@@ -415,8 +415,8 @@
                 }
                     ## Add hla typing of the source query
                         else if (strUser == "source_hla_typing") {
-                    if ($("#source_hla_typing").length === 0) {
-                        var element = '<tr id = "source_hla_typing" name = "source_hla_typing">' +
+                    if ($("#source_hla_typing").length == 0) {
+                        element = '<tr id = "source_hla_typing" name = "source_hla_typing">' +
                                 '<td>Source hla typing: </td>' +
                                 '<td><input style="font-size:14px"  id = "source_hla_typing_input" name="source_hla_typing" type="text" /></td>' +
                                 '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
@@ -428,10 +428,10 @@
                         $("tr:first").append(element);
                     }
                 }
-                    ## Add hla typing of the source query
+                    ## Add protein query
                         else if (strUser == "protein") {
-                    if ($("#protein").length === 0) {
-                        var element = '<tr id = "protein" name = "protein">' +
+                    if ($("#protein").length == 0) {
+                        element = '<tr id = "protein" name = "protein">' +
                                 '<td>Protein ID: </td>' +
                                 '<td><input style="font-size:14px"  id = "protein_input" name="protein" type="text" /></td>' +
                                 '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
@@ -474,7 +474,8 @@
 
 </fieldset>
 <div id="toggle_usage_button">
-<button onclick="toggle_usage()" style="font-size:14px">Usage</button>
+    <br>
+<button onclick="toggle_usage()" style="font-size:14px">Usage information</button>
 </div>
 </body>
 </html>
