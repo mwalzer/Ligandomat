@@ -151,11 +151,30 @@ def create_query(search_dict):
         # combining the input
         for i, source_hla_typing in enumerate(source_hla_typing_input):
             if i != len(source_hla_typing_input)-1:
-                filter_string += " source_hla_typing LIKE '" + researcher.strip() + "' " + search_dict["source_hla_typing_logic"]
+                #TODO: funzt nicht da source_hla_typing != HLA-name ist
+                filter_string += " gene_group LIKE '" + source_hla_typing.strip() + "' " + search_dict["source_hla_typing_logic"]
             else:
-                filter_string += " source_hla_typing LIKE '" + researcher.strip() + "' "
+                filter_string += " gene_group LIKE '" + source_hla_typing.strip() + "' "
         filter_string += ") "
 
+    # Protein
+    if "protein_input" in search_dict.keys():
+        protein_input = search_dict["protein_input"].split(";")
+        # if it is not first an "AND" must be added
+        if first:
+            filter_string += " ( "
+            first = False
+        else:
+            filter_string += " AND ( "
+        # combining the input
+        for i, protein in enumerate(protein_input):
+            if i != len(protein_input)-1:
+                filter_string += " uniprot_accession_pm LIKE '" + protein.strip() + "' " + search_dict["protein_logic"]
+            else:
+                filter_string += " uniprot_accession_pm LIKE '" + protein.strip() + "' "
+        filter_string += ") "
+
+    # Standard filters
     filter_string += " AND ionscore > " + str(search_dict["ionscore_input"]) \
                      + " AND e_value < " + str(search_dict["e_value_input"]) \
                      + " AND q_value < " + str(search_dict["q_value_input"]) \

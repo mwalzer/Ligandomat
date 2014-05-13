@@ -346,7 +346,7 @@
                 }
                     ## Add source name query
                         else if (strUser == "source_name") {
-                    if ($("#source").length == 0) {
+                    if ($("#source_name").length == 0) {
                         element = '<tr id = "source_name" name = "source">' +
                                 '<td>Source name: </td>' +
 

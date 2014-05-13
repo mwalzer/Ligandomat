@@ -119,29 +119,29 @@ def access_data_query(request):
     form.setChoices()
 
     # Connecting to the DB using MySQLdb
-    conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd, db=config.db,
+    conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd,
                            port=config.port)
     c = conn.cursor(MySQLdb.cursors.DictCursor)
+    c.execute("SET tmp_table_size = 4096000")
 
     if "search" in request.params:
         # Collecting input from Mako and creating query parts
         search_dict = ast.literal_eval(request.params.get("search"))
         querystring = queries.search_query_new + create_query(search_dict)
 
-        c.execute("SET tmp_table_size = 4096000")
         print querystring
         c.execute(querystring)
         result = c.fetchall()
 
         # Write ouput
-        header = ['sequence', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ', 'minScore', 'maxScore', 'minE', 'maxE', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+        header = ['sequence', 'uniprot_accession', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ', 'minScore', 'maxScore', 'minE', 'maxE', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
         filename = authenticated_userid(request) + '.xls'
         if os.path.isfile(filename) == 1:
             os.remove(filename)
         XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
 
         template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows = result)
+        result = template.render(rows=result)
         return Response(result)
 
     if "search_run_name_name" in request.params:
@@ -159,12 +159,12 @@ def access_data_query(request):
 
             template = Template(filename='./ligandomat/templates/output/table_run_information.mako')
             result = template.render(rows = result)
+            conn.close()
             return Response(result)
         else:
             search_dict = ast.literal_eval(request.params.get("search_run_name_name"))
             querystring = queries.query_run_name_info_peptides % (search_dict["ionscore_input"], search_dict["e_value_input"]
                                                                   , search_dict["q_value_input"], search_dict["run_name"])
-            c.execute("SET tmp_table_size = 4096000")
             c.execute(querystring)
             result = c.fetchall()
 
@@ -177,6 +177,7 @@ def access_data_query(request):
 
             template = Template(filename='./ligandomat/templates/output/table_run_information_peptides.mako')
             result = template.render(rows = result)
+            conn.close()
             return Response(result)
 
     if "search_source_name" in request.params:
@@ -193,13 +194,13 @@ def access_data_query(request):
 
             template = Template(filename='./ligandomat/templates/output/table_source_information.mako')
             result = template.render(rows = result)
+            conn.close()
             return Response(result)
         else:
             search_dict = ast.literal_eval(request.params.get("search_source_name"))
             querystring = queries.query_source_info_peptides % (search_dict["ionscore_input"], search_dict["e_value_input"],
                                                                 search_dict["q_value_input"], search_dict["source"])
             #querystring = queries.query_source_info_peptides % (request.params.get("search_source_name"))
-            c.execute("SET tmp_table_size = 4096000")
             c.execute(querystring)
             result = c.fetchall()
 
@@ -212,8 +213,8 @@ def access_data_query(request):
 
             template = Template(filename='./ligandomat/templates/output/table_source_information_peptides.mako')
             result = template.render(rows=result)
+            conn.close()
             return Response(result)
-
 
     # If no case was selected return to the site itself
     return dict(form=form, logged_in=authenticated_userid(request))

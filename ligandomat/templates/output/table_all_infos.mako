@@ -32,9 +32,15 @@
                 % if key == 1000:
                     <% return %>
                 % endif
+                ##% uniprot = ${row['uniprot_accession']}.split(', ')
+
                 <tr align="center" valign="middle">
                     <td>${row['sequence']}</td>
-                    <td> -</td>
+                    <td>
+                    % for acc in row['uniprot_accession'].split(', '):
+                        <a href="http://www.uniprot.org/uniprot/${acc}">${acc}</a>
+                    % endfor
+                    </td>
                     <td> ${row['sourcename']} </td>
                     <td> ${row['hlatype']} </td>
                     <td> ${row['minRT']} </td>
