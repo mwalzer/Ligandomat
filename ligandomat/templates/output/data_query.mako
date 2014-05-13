@@ -20,9 +20,16 @@
 
     ## Combines all query inputs
         function combine_peptide_query() {
-    var element_values = ["sequence_input", "run_name_input", "source_name_input", "organ_input", "tissue_input",
-        "dignity_input", "researcher_input", "source_hla_typing_input", "ionscore_input",
-        "e_value_input", "q_value_input","protein_input"];
+    var element_values = ["sequence_input","sequence_logic",
+                          "run_name_input","run_name_logic",
+                          "source_name_input","source_name_logic",
+                          "organ_input", "organ_logic",
+                          "tissue_input", "tissue_logic",
+                          "dignity_input", "dignity_logic",
+                          "researcher_input", "researcher_logic",
+                          "source_hla_typing_input", "source_hla_typing_logic",
+                          "protein_input", "protein_logic",
+                          "ionscore_input", "e_value_input","q_value_input"];
     var values_string = "{";
     for (var i = 0; i < element_values.length; i++){
         if (document.getElementById(element_values[i]) != null) {
@@ -90,17 +97,17 @@
                 '<legend>Usage:</legend>' +
                         '<b>General usage:</b>'+
                 '<ol>' +
-                        '<li>Select the output format.</li>' +
+                        '<li>Select the output type.</li>' +
                         '<li>Detailed peptide list:' +
                                 '<ol>' +
                                 '<li>Choose search parameters and add these.</li>' +
-                                '<li>If you can choose between "OR" and "AND" it is possible for multiple inputs. Seperate the elements with a ";" (no quotes!)</li>' +
+                                '<li>If you can choose between "OR" and "AND" it is possible for multiple inputs. Seperate the elements with a ";" (no quotes!).</li>' +
                                 '<li>All parameters can be combined.</li>' +
                                 '</ol>' +
                         '</li>' +
                         '<li>Run and source information:' +
                                 '<ol>' +
-                                '<li>Write your run or source into the box (Wildcards allowed)</li>' +
+                                '<li>Write your run or source into the box (Wildcards allowed).</li>' +
                                 '<li>If you select "Count peptides" please set the filter parameters.</li>' +
                                 '</ol>' +
                         '</li>' +
@@ -305,12 +312,14 @@
                         element =
 
                                 '<tr id = "sequence" name = "sequence">' +
-                                        '<form>' +
 
 
                                         '<td>Sequence:</td> ' +
                                         '<td><input style="font-size:14px" name="sequence" id="sequence_input" type="text" /></td>' +
-                                        '</form>' +
+                                        '<td> <select id="sequence_logic" style="font-size:14px" name="sequence_logic_name">'+
+                                            '<option value="AND" selected="selected">AND</option>'+
+                                            '<option value="OR">OR</option>'+
+                                        '</select>'+
 
                                         '<td><input type="image" src="../../static/minus.png" height="22" id = "sequence" onclick=removeCriteria("sequence")></td>' +
                                         '</tr>';
@@ -325,6 +334,10 @@
 
 
                                 '<td><input style="font-size:14px" id = "run_name_input" name="run_name" type="text" /></td>' +
+                                '<td> <select id="run_name_logic" style="font-size:14px" name="run_name_logic_name">'+
+                                    '<option value="AND" selected="selected">AND</option>'+
+                                    '<option value="OR">OR</option>'+
+                                '</select>'+
 
                                 '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("run_name")></td>' +
                                 '</tr>';
@@ -339,6 +352,10 @@
 
 
                                 '<td><input style="font-size:14px" id = "source_name_input" name="source_name" type="text" /></td>' +
+                                '<td> <select id="source_name_logic" style="font-size:14px" name="source_name_logic_name">'+
+                                    '<option value="AND" selected="selected">AND</option>'+
+                                    '<option value="OR">OR</option>'+
+                                '</select>'+
 
                                 '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("source_name")></td>' +
                                 '</tr>';
@@ -353,7 +370,7 @@
 
 
                                 '<td><input style="font-size:14px" id = "organ_input" name="organ" type="text" /></td>' +
-                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                '<td> <select id="organ_logic" style="font-size:14px" name="organ_logic_name">'+
                                     '<option value="AND" selected="selected">AND</option>'+
                                     '<option value="OR">OR</option>'+
                                 '</select>'+
@@ -370,7 +387,7 @@
                                 '<td>Tissue: </td>' +
 
                                 '<td><input style="font-size:14px"  id = "tissue_input" name="tissue" type="text" /></td>' +
-                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                '<td> <select id="tissue_logic" style="font-size:14px" name="tissue_logic_name">'+
                                     '<option value="AND" selected="selected">AND</option>'+
                                     '<option value="OR">OR</option>'+
                                 '</select>'+
@@ -388,7 +405,7 @@
 
 
                                 '<td><input style="font-size:14px"  id = "dignity_input" name="dignity" type="text" /></td>' +
-                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                '<td> <select id="dignity_logic" style="font-size:14px" name="dignity_logic_name">'+
                                     '<option value="AND" selected="selected">AND</option>'+
                                     '<option value="OR">OR</option>'+
                                 '</select>'+
@@ -402,10 +419,14 @@
                         else if (strUser == "researcher") {
                     if ($("#researcher").length == 0) {
                         element = '<tr id = "researcher" name = "researcher">' +
-                                '<td>Researcher: </td>' +
+                                '<td>Researcher (last name): </td>' +
 
 
                                 '<td><input style="font-size:14px" id = "researcher_input" name="researcher" type="text" /></td>' +
+                                '<td> <select id="researcher_logic" style="font-size:14px" name="researcher_logic_name">'+
+                                    '<option value="AND" selected="selected">AND</option>'+
+                                    '<option value="OR">OR</option>'+
+                                '</select>'+
 
 
                                 '<td><input type="image" src="../../static/minus.png" height="22"   onclick=removeCriteria("researcher")></td>' +
@@ -419,7 +440,7 @@
                         element = '<tr id = "source_hla_typing" name = "source_hla_typing">' +
                                 '<td>Source hla typing: </td>' +
                                 '<td><input style="font-size:14px"  id = "source_hla_typing_input" name="source_hla_typing" type="text" /></td>' +
-                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                '<td> <select id="source_hla_typing_logic" style="font-size:14px" name="source_hla_typing_logic_name">'+
                                     '<option value="AND" selected="selected">AND</option>'+
                                     '<option value="OR">OR</option>'+
                                 '</select>'+
@@ -434,7 +455,7 @@
                         element = '<tr id = "protein" name = "protein">' +
                                 '<td>Protein ID: </td>' +
                                 '<td><input style="font-size:14px"  id = "protein_input" name="protein" type="text" /></td>' +
-                                '<td> <select id="query_logic" style="font-size:14px" name="query_logic_name">'+
+                                '<td> <select id="protein_logic" style="font-size:14px" name="protein_logic_name">'+
                                     '<option value="AND" selected="selected">AND</option>'+
                                     '<option value="OR">OR</option>'+
                                 '</select>'+
@@ -476,6 +497,7 @@
 <div id="toggle_usage_button">
     <br>
 <button onclick="toggle_usage()" style="font-size:14px">Usage information</button>
+
 </div>
 </body>
 </html>

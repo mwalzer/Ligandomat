@@ -55,7 +55,7 @@ def XlsDictWriter(f, ld, sheet_name='sheet', headerlist=[]):
         for i, r in enumerate(ld):
             for j, key in enumerate(headerlist):
                 try:
-                    sheet.write(i + 1, j, label=smart_str(r[key]))
+                    sheet.write(i + 1, j, label=r[key])
                 except:
                     sheet.write(i + 1, j, label="N/A")
         book.save(f)

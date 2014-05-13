@@ -123,14 +123,13 @@ def access_data_query(request):
                            port=config.port)
     c = conn.cursor(MySQLdb.cursors.DictCursor)
 
-
-
     if "search" in request.params:
         # Collecting input from Mako and creating query parts
         search_dict = ast.literal_eval(request.params.get("search"))
         querystring = queries.search_query_new + create_query(search_dict)
 
         c.execute("SET tmp_table_size = 4096000")
+        print querystring
         c.execute(querystring)
         result = c.fetchall()
 
