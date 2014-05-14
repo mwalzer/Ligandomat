@@ -97,8 +97,19 @@ search_query_new = """
 SELECT
         sequence,
     GROUP_CONCAT(DISTINCT source.name SEPARATOR ', ') AS sourcename,
-    GROUP_CONCAT(DISTINCT gene_group
-        SEPARATOR ', ') as 'hlatype',
+    GROUP_CONCAT(DISTINCT source.name SEPARATOR ', ') AS sourcename,
+    CASE
+WHEN expression_suffix IS NOT NULL THEN GROUP_CONCAT(DISTINCT
+		Concat(gene_group,':', specific_protein,':',dna_coding,':',dna_noncoding,expression_suffix)
+        SEPARATOR ', ')
+WHEN  dna_noncoding IS NOT NULL THEN GROUP_CONCAT(DISTINCT Concat(gene_group,':', specific_protein,':',dna_coding,':',dna_noncoding)
+        SEPARATOR ', ')
+WHEN dna_coding IS NOT NULL THEN GROUP_CONCAT(DISTINCT Concat(gene_group,':', specific_protein,':',dna_coding)
+        SEPARATOR ', ')
+WHEN specific_protein IS NOT NULL THEN GROUP_CONCAT(DISTINCT Concat(gene_group,':', specific_protein)
+        SEPARATOR ', ')
+ELSE GROUP_CONCAT(DISTINCT gene_group SEPARATOR ', ')
+ END as 'hlatype' ,
 
     ROUND(MIN(RT), 2) as minRT,
     ROUND(MAX(RT), 2) as maxRT,
@@ -106,29 +117,16 @@ SELECT
     ROUND(MAX(MZ), 2) as maxMZ,
     MIN(ionscore) as minScore,
     MAX(ionscore) as maxScore,
-    MIN(e_value) as minE,
-    MAX(e_value) as maxE,
-    MIN(q_value) as minQ,
-    MAX(q_value) as maxQ,
+    ROUND(MIN(e_value), 2) as minE,
+    ROUND(MAX(e_value), 2) as maxE,
+    ROUND(MIN(q_value), 2) as minQ,
+    ROUND(MAX(q_value), 2) as maxQ,
     GROUP_CONCAT(DISTINCT filename
         SEPARATOR ', ') as 'runnames',
     antibody_set,
     GROUP_CONCAT(DISTINCT organ SEPARATOR ', ') as organ,
     GROUP_CONCAT(DISTINCT tissue SEPARATOR ', ') as tissue,
     GROUP_CONCAT(DISTINCT dignity SEPARATOR ', ') as dignity,
-    peptide_id,
-    peptide_peptide_id,
-    ms_run_id,
-    ms_run_ms_run_id,
-    source_id,
-    ms_run.source_source_id,
-    mhcpraep_id,
-    mhcpraep_mhcpraep_id,
-    person_id,
-    ms_run.person_person_id,
-    source_hlatyping.source_source_id,
-	hlaallele_id,
-	source_hlatyping.hlaallele_hlaallele_id,
 	GROUP_CONCAT(DISTINCT peptide_mapping.uniprot_accession_pm SEPARATOR ', ') as uniprot_accession
 FROM
     LigandosphereDB_dev.peptide

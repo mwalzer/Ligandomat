@@ -154,17 +154,17 @@ def create_query(search_dict):
             hla_query = "( gene_group = '" + hla_type[0].strip() + "' "
             # Protein (4 digits)
             if len(hla_type) > 1:
-                hla_query += " AND " + " specific_protein = '" + hla_type[1].strip()+"' "
+                hla_query += " AND " + " specific_protein = " + str(int(hla_type[1].strip()))
             # DNA coding (6 digits)
             if len(hla_type) > 2:
-                hla_query += " AND " + " dna_coding =  '" + hla_type[2].strip() + "' "
+                hla_query += " AND " + " dna_coding =  " + str(int(hla_type[2].strip()))
             # DNA non-coding (8 digits)
             if len(hla_type) > 3:
                 # Expression suffix (extra char suffix)
                 if hla_type[3].strip()[-1].isalpha():
-                    hla_query += " AND " + " dna_noncoding = '" + hla_type[3].strip()[:-1] + "' AND expression_suffix == '" + hla_type[3].strip()[-1] + "' "
+                    hla_query += " AND " + " dna_noncoding = " + str(int(hla_type[3].strip()[:-1])) + " AND expression_suffix == '" + hla_type[3].strip()[-1] + "' "
                 else:
-                    hla_query += " AND " + " dna_noncoding = '" + hla_type[3].strip() + "' "
+                    hla_query += " AND " + " dna_noncoding = " + str(int(hla_type[3].strip()))
             # creating the query. If more than one typing is provided they are combined
             if i != len(source_hla_typing_input)-1:
                 filter_string += hla_query + ") " + search_dict["source_hla_typing_logic"]
