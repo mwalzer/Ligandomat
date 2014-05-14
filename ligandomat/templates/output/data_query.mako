@@ -15,7 +15,11 @@
         alert("The filter section avoids unsignificant hits in the results.\n\nSetting loose filter parameters results in longer computation times.");
     }else if (s == "add_criteria_help"){
         alert("Choose a parameter out of the list and add it.\n\nYou can combine all parameters with each other.");
+    }else if (s == "source_hla_typing_help"){
+        alert("The HLA-Typing does NOT allow wildcards!\nExamples:\nA*01\nA*02:01\nA*02:101:01:02N");
     }
+
+
     }
 
     ## Combines all query inputs
@@ -438,13 +442,14 @@
                         else if (strUser == "source_hla_typing") {
                     if ($("#source_hla_typing").length == 0) {
                         element = '<tr id = "source_hla_typing" name = "source_hla_typing">' +
-                                '<td>Source hla typing: </td>' +
+                                '<td>Source HLA typing: </td>' +
                                 '<td><input style="font-size:14px"  id = "source_hla_typing_input" name="source_hla_typing" type="text" /></td>' +
                                 '<td> <select id="source_hla_typing_logic" style="font-size:14px" name="source_hla_typing_logic_name">'+
                                     '<option value="AND" selected="selected">AND</option>'+
                                     '<option value="OR">OR</option>'+
                                 '</select>'+
                                 '<td><input type="image" src="../../static/minus.png" height="22"  onclick=removeCriteria("source_hla_typing")></td>' +
+                                '<td><button onclick="help_alert(\'source_hla_typing_help\')" style="font-size:14px">?</button></td>'+
                                 '</tr>';
                         $("tr:first").append(element);
                     }

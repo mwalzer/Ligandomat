@@ -99,6 +99,7 @@ SELECT
     GROUP_CONCAT(DISTINCT source.name SEPARATOR ', ') AS sourcename,
     GROUP_CONCAT(DISTINCT gene_group
         SEPARATOR ', ') as 'hlatype',
+
     ROUND(MIN(RT), 2) as minRT,
     ROUND(MAX(RT), 2) as maxRT,
     ROUND(MIN(MZ), 2) as minMZ,
@@ -107,6 +108,8 @@ SELECT
     MAX(ionscore) as maxScore,
     MIN(e_value) as minE,
     MAX(e_value) as maxE,
+    MIN(q_value) as minQ,
+    MAX(q_value) as maxQ,
     GROUP_CONCAT(DISTINCT filename
         SEPARATOR ', ') as 'runnames',
     antibody_set,

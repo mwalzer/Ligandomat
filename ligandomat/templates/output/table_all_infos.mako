@@ -2,7 +2,8 @@
 
     <form action="ligandomat_output.xls" method="post">
 
-        Download the result in .xls format: <input style="font-size:14px" value="Download" type="submit" name="download_xls" /><br>
+        Showing only 100 peptides at maximum.<br>
+        Download the full result in .xls format: <input style="font-size:14px" value="Download" type="submit" name="download_xls" /><br>
 
         <table border="1" frame="border" rules="all" id='table_all_infos'>
 
@@ -20,6 +21,8 @@
                 <th>MAX ion score</th>
                 <th>MIN e-value</th>
                 <th>MAX e-value</th>
+                <th>MIN q-value</th>
+                <th>MAX q-value</th>
                 <th>file occurrences</th>
                 <th>antibody_set</th>
                 <th>organ</th>
@@ -51,6 +54,8 @@
                     <td> ${row['maxScore']} </td>
                     <td> ${row['minE']} </td>
                     <td> ${row['maxE']} </td>
+                    <td> ${row['minQ']} </td>
+                    <td> ${row['maxQ']} </td>
                     <td> ${row['runnames']} </td>
                     <td> ${row['antibody_set']} </td>
                     <td> ${row['organ']} </td>

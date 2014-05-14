@@ -140,7 +140,6 @@ def create_query(search_dict):
 
     # Source HLA typing
     if "source_hla_typing_input" in search_dict.keys():
-        # TODO: gene_group can be a list or something so a like check is not feasiable.
         source_hla_typing_input = search_dict["source_hla_typing_input"].split(";")
         # if it is not first an "AND" must be added
         if first:
@@ -150,11 +149,27 @@ def create_query(search_dict):
             filter_string += " AND ( "
         # combining the input
         for i, source_hla_typing in enumerate(source_hla_typing_input):
+            hla_type = source_hla_typing.strip().split(':')
+            # Basic gene group (2 digits)
+            hla_query = "( gene_group = '" + hla_type[0].strip() + "' "
+            # Protein (4 digits)
+            if len(hla_type) > 1:
+                hla_query += " AND " + " specific_protein = '" + hla_type[1].strip()+"' "
+            # DNA coding (6 digits)
+            if len(hla_type) > 2:
+                hla_query += " AND " + " dna_coding =  '" + hla_type[2].strip() + "' "
+            # DNA non-coding (8 digits)
+            if len(hla_type) > 3:
+                # Expression suffix (extra char suffix)
+                if hla_type[3].strip()[-1].isalpha():
+                    hla_query += " AND " + " dna_noncoding = '" + hla_type[3].strip()[:-1] + "' AND expression_suffix == '" + hla_type[3].strip()[-1] + "' "
+                else:
+                    hla_query += " AND " + " dna_noncoding = '" + hla_type[3].strip() + "' "
+            # creating the query. If more than one typing is provided they are combined
             if i != len(source_hla_typing_input)-1:
-                #TODO: funzt nicht da source_hla_typing != HLA-name ist
-                filter_string += " gene_group LIKE '" + source_hla_typing.strip() + "' " + search_dict["source_hla_typing_logic"]
+                filter_string += hla_query + ") " + search_dict["source_hla_typing_logic"]
             else:
-                filter_string += " gene_group LIKE '" + source_hla_typing.strip() + "' "
+                filter_string += hla_query + ") "
         filter_string += ") "
 
     # Protein

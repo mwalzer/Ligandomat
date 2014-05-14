@@ -122,7 +122,7 @@ def access_data_query(request):
     conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd,
                            port=config.port)
     c = conn.cursor(MySQLdb.cursors.DictCursor)
-    c.execute("SET tmp_table_size = 4096000")
+    c.execute("SET tmp_table_size = 16000000")
 
     if "search" in request.params:
         # Collecting input from Mako and creating query parts
@@ -134,7 +134,7 @@ def access_data_query(request):
         result = c.fetchall()
 
         # Write ouput
-        header = ['sequence', 'uniprot_accession', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ', 'minScore', 'maxScore', 'minE', 'maxE', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+        header = ['sequence', 'uniprot_accession', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ', 'minScore', 'maxScore', 'minE', 'maxE', 'minQ', 'maxQ', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
         filename = authenticated_userid(request) + '.xls'
         if os.path.isfile(filename) == 1:
             os.remove(filename)
