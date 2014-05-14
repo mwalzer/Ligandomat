@@ -1,15 +1,7 @@
 import os
-import shutil
-import re
 import hashlib
-from sqlalchemy import and_
-from docutils.core import publish_parts
-
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import *
 
 from mako.template import Template
-from pyramid.response import Response
 
 from pyramid.response import Response
 from pyramid.view import (
@@ -22,19 +14,14 @@ from pyramid.security import (
     authenticated_userid,
 )
 from ligandomat.tools import queries
-from .security import groupfinder
-from .forms import Source, Prep, Mass_spec, DataQuery
-from .transformer import *
+from ligandomat.tools.queryCreator import create_query
+from ligandomat.tools import XlsDictAdapter
+from .forms import DataQuery
 from pyramid.httpexceptions import HTTPFound
-from sqlalchemy.exc import DBAPIError
 from .models import *
-from datetime import *
 
-from DBtransfer import *
 from run_list_handling import *
-from tools import reader, patternRec
-import tools
-import presentData
+from pyramid.response import FileResponse
 
 # Index Page ----------------------------------------------------------------------------------------------------------
 @view_config(route_name='home', renderer='ligandomat:templates/index.mako', permission='view')
@@ -108,222 +95,130 @@ def statistics_page(request):
                 seqs=seqs,
                 nSeqs=len(seqs)
     )
+    
+# Download Query
+@view_config(route_name='data_access', match_param="action=ligandomat_output.xls", renderer='ligandomat:templates/output/table_all_infos.mako', permission='view')
+def download(request):
+    if 'download_xls' in request.params:
+        filename = authenticated_userid(request) + '.xls'
+        response = FileResponse(filename, request=request, content_type='application/msexcel')
+        return response
 
 
 # Access Data - Query---------------------------------------------------------------------------------------------------------------
 @view_config(route_name='data_access', renderer='ligandomat:templates/output/data_query.mako',
              match_param='action=query', permission='view')
 def access_data_query(request):
-    """"Query website and funcitonality
+    """"Query website and functionality
 
     The query-strings are in queries.py.
     Connection to the DB using MySQLdb. NOT pyramid!
     """
 
-
-
     form = DataQuery(request.POST)
     form.setChoices()
-    session = request.session
-
-    # Getting all the parameters from the input Mako
-    pat = request.params.get('subsequence')
-    pat_sorting_by = request.params.get('sorting_pat')
-    run_pat = request.params.get('runname_subsequence')
-    runname_sorting_by = request.params.get('sorting_runname')
-    organ = request.params.get('organ_subsequence')
-    organ_sorting_by = request.params.get('sorting_organ')
-    tissue = request.params.get('tissue_subsequence')
-    tissue_sorting_by = request.params.get('sorting_tissue')
-
-    # Collecting input from Mako
-    sequence = request.params.get('sequence')
-    run_name = request.params.get('run_name')
-    source_name = request.params.get('source_name')
-    organ = request.params.get('organ')
-    tissue = request.params.get('tissue')
-    dignity = request.params.get('dignity')
-    researcher = request.params.get('researcher')
-    source_hla_typing = request.params.get('source_hla_typing')
-
-    # Collecting filters from Mako
-    ionscore = request.params.get('ionscore')
-    e_value = request.params.get('e-Value')
-    q_value = request.params.get('q-Value')
-
-
 
     # Connecting to the DB using MySQLdb
-    conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd, db=config.db,
+    conn = MySQLdb.connect(host=config.host, user=config.user, passwd=config.passwd,
                            port=config.port)
     c = conn.cursor(MySQLdb.cursors.DictCursor)
+    c.execute("SET tmp_table_size = 16000000")
 
+    if "search" in request.params:
+        # Collecting input from Mako and creating query parts
+        search_dict = ast.literal_eval(request.params.get("search"))
+        querystring = queries.search_query_new + create_query(search_dict)
 
-    if 'search_by_subsequence' in request.params:
-        searchstring = pat
-        querystring = queries.search_by_subsequence
-
-        c.execute(querystring % (searchstring, pat_sorting_by))
-        result = c.fetchall()
-        #result = database_prediction(result)
-        #result = annotate(result)
-        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows = result)
-        return Response(result)
-
-    if 'search_all' in request.params:
-        c.execute("SELECT DISTINCT sequence FROM spectrum_hit INNER JOIN peptide ON peptide_id = peptide_peptide_id")
+        print querystring
+        c.execute(querystring)
         result = c.fetchall()
 
-        output = template('table_all_sequences', rows=result)
+        # Write ouput
+        header = ['sequence', 'uniprot_accession', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ', 'minScore', 'maxScore', 'minE', 'maxE', 'minQ', 'maxQ', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+        filename = authenticated_userid(request) + '.xls'
+        if os.path.isfile(filename) == 1:
+            os.remove(filename)
+        XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
 
-    if 'search_by_runname' in request.params:
-        querystring = queries.search_by_runname
-        c.execute(querystring % (run_pat, runname_sorting_by))
-        result = c.fetchall()
-        #	result = database_prediction(result)
-        #result = annotate(result)
-        #output = template('table_run_query', rows=result)
         template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
         result = template.render(rows=result)
         return Response(result)
 
-    if 'search_by_organ' in request.params:
-        querystring = queries.search_by_organ
-        c.execute(querystring % (organ, organ_sorting_by))
-        result = c.fetchall()
-        #result = database_prediction(result)
-        #result = annotate(result)
-        #output = template('table_all_infos', rows=result)
-        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows=result)
-        return Response(result)
+    if "search_run_name_name" in request.params:
+        if "peptide_count" not in request.params:
+            querystring = queries.query_run_name_info % (request.params.get("search_run_name_name"))
+            c.execute(querystring)
+            result = c.fetchall()
 
-    if 'search_by_tissue' in request.params:
-        querystring = queries.search_by_tissue
-        c.execute(querystring % (tissue, tissue_sorting_by))
-        result = c.fetchall()
-        #result = database_prediction(result)
-        #result = annotate(result)
-        #output = template('table_all_infos', rows=result)
-        template = Template(filename='./ligandomat/templates/output/table_all_infos.mako')
-        result = template.render(rows=result)
-        return Response(result)
+            # Write ouput
+            header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass', 'antibody_set', 'hlatype']
+            filename = authenticated_userid(request) + '.xls'
+            if os.path.isfile(filename) == 1:
+                os.remove(filename)
+            XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
 
-    #  Old query webpage
-    # # PEPTIDE
-    # if 'button_peptide_all' in request.params:
-    #     #session['action'] = 'peptide_all'
-    #     return HTTPFound(location=request.route_url('statistics'))
-    #
-    # if 'button_peptide_info' in request.params:
-    #     session['action'] = 'peptide_info'
-    #     session['sequence'] = request.params['peptide_info']
-    #     return HTTPFound(location=request.route_url('data_access', action='output_peptides'))
-    #
-    # if 'button_peptide_pattern' in request.params:
-    #     session['action'] = 'peptide_pattern'
-    #     session['pattern'] = request.params['peptide_pattern']
-    #
-    #     return HTTPFound(location=request.route_url('data_access', action='output_peptides'))
-    #
-    # # SOURCE
-    # if 'button_source_detail' in request.params:
-    #     session['action'] = 'source_detail'
-    #     session['source'] = request.params['source_detail']
-    #     return HTTPFound(location=request.route_url('data_access', action='output_sources'))
-    #
-    # if 'button_source_peptides' in request.params:
-    #     session['action'] = 'source_peptides'
-    #     session['source'] = request.params['source_peptides']
-    #     return HTTPFound(location=request.route_url('data_access', action='output_peptides'))
-    #
-    # if 'button_get_mining_csv' in request.params:
-    #     con = Connection()
-    #     name = 'mining' + datetime.today().isoformat()[0:10] + '.csv'
-    #     con.getMiningTable(name)
-    #     return HTTPFound(location=request.route_url('Ligandomat'))
+            template = Template(filename='./ligandomat/templates/output/table_run_information.mako')
+            result = template.render(rows = result)
+            conn.close()
+            return Response(result)
+        else:
+            search_dict = ast.literal_eval(request.params.get("search_run_name_name"))
+            querystring = queries.query_run_name_info_peptides % (search_dict["ionscore_input"], search_dict["e_value_input"]
+                                                                  , search_dict["q_value_input"], search_dict["run_name"])
+            c.execute(querystring)
+            result = c.fetchall()
+
+            # Write output
+            header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass', 'antibody_set', 'hlatype', 'number_of_peptides']
+            filename = authenticated_userid(request) + '.xls'
+            if os.path.isfile(filename) == 1:
+                os.remove(filename)
+            XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+
+            template = Template(filename='./ligandomat/templates/output/table_run_information_peptides.mako')
+            result = template.render(rows = result)
+            conn.close()
+            return Response(result)
+
+    if "search_source_name" in request.params:
+        if "peptide_count" not in request.params:
+            querystring = queries.query_source_info % (request.params.get("search_source_name"))
+            c.execute(querystring)
+            result = c.fetchall()
+            # Write output
+            header = ['name', 'organ', 'dignity', 'tissue', 'hlatype']
+            filename = authenticated_userid(request) + '.xls'
+            if os.path.isfile(filename) == 1:
+                os.remove(filename)
+            XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+
+            template = Template(filename='./ligandomat/templates/output/table_source_information.mako')
+            result = template.render(rows = result)
+            conn.close()
+            return Response(result)
+        else:
+            search_dict = ast.literal_eval(request.params.get("search_source_name"))
+            querystring = queries.query_source_info_peptides % (search_dict["ionscore_input"], search_dict["e_value_input"],
+                                                                search_dict["q_value_input"], search_dict["source"])
+            #querystring = queries.query_source_info_peptides % (request.params.get("search_source_name"))
+            c.execute(querystring)
+            result = c.fetchall()
+
+            # Write ouput
+            header = ['name', 'organ', 'dignity', 'tissue', 'hlatype', 'number_of_peptides']
+            filename = authenticated_userid(request) + '.xls'
+            if os.path.isfile(filename) == 1:
+                os.remove(filename)
+            XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
+
+            template = Template(filename='./ligandomat/templates/output/table_source_information_peptides.mako')
+            result = template.render(rows=result)
+            conn.close()
+            return Response(result)
 
     # If no case was selected return to the site itself
     return dict(form=form, logged_in=authenticated_userid(request))
 
-
-# Access Data - Output -----------------------PEPTIDES---------------------------------------------------------------------------------------
-@view_config(route_name='data_access', renderer='ligandomat:templates/output/peptides.mako',
-             match_param='action=output_peptides', permission='view')
-def access_data_output_peptides(request):
-    """ Old peptide query result page. Not used anymore!"""
-
-
-
-
-
-
-    # session = request.session
-    # action = session['action']
-    #
-    # if action == 'peptide_all':
-    #     peptides = DBSession.query(Peptide).all()
-    #     table = presentData.fastPeptidesTable(DBSession, Peptide, Hit, SourceData, SourceHLA, HLAAllele, PrepData,
-    #                                           MSData, Person, peptides)
-    # if action == 'peptide_pattern':
-    #     pattern = session['pattern']
-    #     peptides = patternRec.getPatternPeptides(pattern, DBSession, Peptide)
-    #     message = 'Peptides that share the pattern %s' % pattern
-    #     table = presentData.fastPeptidesTable(DBSession, Peptide, Hit, SourceData, SourceHLA, HLAAllele, PrepData,
-    #                                           MSData, Person, peptides)
-    #
-    # if action == 'peptide_info':
-    #     sequence = session['sequence']
-    #     message = 'Information about the peptide %s' % sequence
-    #     peptide = getPeptideBySeq(DBSession, Peptide, sequence)
-    #     if peptide is None:
-    #         return Response('Sorry, this peptide could not be found in our data bank :(')
-    #     table = presentData.smallPeptidesTable(DBSession, Peptide, Hit, SourceData, SourceHLA, HLAAllele, PrepData,
-    #                                            MSData, Person, [peptide])
-    #
-    # if action == 'source_peptides':
-    #     source = getSourceFromCollectInt(DBSession, SourceData, int(session['source']))
-    #     message = "Peptides of source %s :" % source.name
-    #     #TODO
-    #     ms_runs = DBSession.query(MSData.ms_run_id).filter(MSData.source_source_id == source.source_id).all()
-    #     hits = DBSession.query(Hit.peptide_peptide_id).filter(Hit.ms_run_ms_run_id in ms_runs).all()
-    #     print hits
-    #     return Response("bla")
-    #     peptides = DBSession.query(Peptide).get(Peptide.peptide_id in hits)
-    #     table = presentData.smallPeptidesTable(DBSession, Peptide, Hit, SourceData, SourceHLA, HLAAllele, PrepData,
-    #                                            MSData, Person, peptides)
-    #
-    #     return dict(logged_in=authenticated_userid(request),
-    #                 message=message,
-    #                 table=table)
-
-    #session.invalidate()
-
-
-    return dict(logged_in=authenticated_userid(request),
-                message=message,
-                table=table)
-
-
-# Access Data - Output -----------------------SOURCE---------------------------------------------------------------------------------------
-@view_config(route_name='data_access', renderer='ligandomat:templates/output/sources.mako',
-             match_param='action=output_sources', permission='view')
-def access_data_output_source(request):
-    """ Old source query result page. Not used anymore!"""
-    session = request.session
-    action = session['action']
-
-    if action == 'source_detail':
-        source = getSourceFromCollectInt(DBSession, SourceData, int(session['source']))
-        message = 'Information about the requested source %s' % source.name
-        if 'button_change_source' in request.params:
-            session['fyi'] = 'One job... Only one job...'
-            session['image'] = 'onejob'
-            return HTTPFound(location=request.route_url('fyi'))
-        return dict(logged_in=authenticated_userid(request),
-                    message=message,
-                    table=SourceData.stringIt(source))
 
 
 # Forbidden View
