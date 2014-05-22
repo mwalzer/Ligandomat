@@ -7,6 +7,7 @@
 
 <script>
 
+
     ## Help alert box
     function help_alert(s) {
     if (s == "select_help") {
@@ -33,6 +34,7 @@
                           "researcher_input", "researcher_logic",
                           "source_hla_typing_input", "source_hla_typing_logic",
                           "protein_input", "protein_logic",
+                          "prediction_information",
                           "ionscore_input", "e_value_input","q_value_input"];
     var values_string = "{";
     for (var i = 0; i < element_values.length; i++){
@@ -49,10 +51,10 @@
             ## Which query?
             var element_values = [];
             if (document.getElementById("search_run_name_id") != null){
-                element_values = ["run_name", "ionscore_input","e_value_input", "q_value_input"];
+                element_values = ["run_name","prediction_information", "ionscore_input","e_value_input", "q_value_input"];
             }
             else if (document.getElementById("search_source_id") != null){
-                element_values = ["source", "ionscore_input","e_value_input", "q_value_input"];
+                element_values = ["source","prediction_information", "ionscore_input","e_value_input", "q_value_input"];
             }
             ## Get the items
             var values_string = "{";
@@ -126,6 +128,155 @@
                 '</fieldset>';
 
                 $("#toggle_usage_button").append(usage);
+
+
+                }
+
+            }
+
+    )
+    }
+
+
+
+    function add_hla_to_prediction_list(selected_hla){
+            if (document.getElementById("prediction_information") != null){
+                     for (option = 0; option < selected_hla.options.length; option++) {
+                            if (selected_hla.options[option].selected) {
+                                toAdd = selected_hla.options[option].value;
+
+                                if (document.getElementById("prediction_information").value == '') {
+                                    document.getElementById("prediction_information").value = toAdd;
+                                } else {
+                                    if (document.getElementById("prediction_information").value.indexOf(toAdd)==-1){
+                                        document.getElementById("prediction_information").value += ";" + toAdd;
+                                    }
+                                }
+                            }
+                     }
+            }
+    }
+
+
+
+    function toggle_prediction(){
+    $(document).ready(function(){
+                if (document.getElementById("prediction_box") != null) {
+                            document.getElementById("prediction_box").remove();
+                }else{
+                    ##onclick = "combine_peptide_query()
+                    var usage =
+                '<fieldset id="prediction_box" style="border:0px; padding:0px;margin:0px">' +
+                '<table style="width:400px" id="hla_list"><tr><td>' +
+                        'Choose HLA for prediction:</td><td>'+
+                        '<select multiple name="selected_hla_type" size="10" onclick = "add_hla_to_prediction_list(this)">'+
+                            '<optgroup label="HLA-A">'+
+                                '<option value="A*01:01">A*01:01</option>'+
+                                '<option value="A*02:01">A*02:01</option>'+
+                                '<option value="A*02:02">A*02:02</option>'+
+                                '<option value="A*02:03">A*02:03</option>'+
+                                '<option value="A*02:06">A*02:06</option>'+
+                                '<option value="A*02:11">A*02:11</option>'+
+                                '<option value="A*02:12">A*02:12</option>'+
+                                '<option value="A*02:16">A*02:16</option>'+
+                                '<option value="A*02:17">A*02:17</option>'+
+                                '<option value="A*02:19">A*02:19</option>'+
+                                '<option value="A*02:50">A*02:50</option>'+
+                                '<option value="A*03:01">A*03:01</option>'+
+                                '<option value="A*11:01">A*11:01</option>'+
+                                '<option value="A*23:01">A*23:01</option>'+
+                                '<option value="A*24:02">A*24:02</option>'+
+                                '<option value="A*24:03">A*24:03</option>'+
+                                '<option value="A*25:01">A*25:01</option>'+
+                                '<option value="A*26:01">A*26:01</option>'+
+                                '<option value="A*26:02">A*26:02</option>'+
+                                '<option value="A*26:03">A*26:03</option>'+
+                                '<option value="A*29:02">A*29:02</option>'+
+                                '<option value="A*30:01">A*30:01</option>'+
+                                '<option value="A*30:02">A*30:02</option>'+
+                                '<option value="A*31:01">A*31:01</option>'+
+                                '<option value="A*32:01">A*32:01</option>'+
+                                '<option value="A*32:07">A*32:07</option>'+
+                                '<option value="A*32:15">A*32:15</option>'+
+                                '<option value="A*33:01">A*33:01</option>'+
+                                '<option value="A*33:03">A*33:03</option>'+
+                                '<option value="A*66:01">A*66:01</option>'+
+                                '<option value="A*68:01">A*68:01</option>'+
+                                '<option value="A*68:02">A*68:02</option>'+
+                                '<option value="A*68:23">A*68:23</option>'+
+                                '<option value="A*69:01">A*69:01</option>'+
+                                '<option value="A*80:01">A*80:01</option>'+
+                            '</optgroup>'+
+                            '<optgroup label="HLA-B">'+
+                                '<option value="B*07:02">B*07:02</option>'+
+                                '<option value="B*08:01">B*08:01</option>'+
+                                '<option value="B*08:02">B*08:02</option>'+
+                                '<option value="B*08:03">B*08:03</option>'+
+                                '<option value="B*13:02">B*13:02</option>'+
+                                '<option value="B*14:02">B*14:02</option>'+
+                                '<option value="B*15:01">B*15:01</option>'+
+                                '<option value="B*15:02">B*15:02</option>'+
+                                '<option value="B*15:03">B*15:03</option>'+
+                                '<option value="B*15:09">B*15:09</option>'+
+                                '<option value="B*15:10">B*15:10</option>'+
+                                '<option value="B*15:16">B*15:16</option>'+
+                                '<option value="B*15:17">B*15:17</option>'+
+                                '<option value="B*18:01">B*18:01</option>'+
+                                '<option value="B*27:05">B*27:05</option>'+
+                                '<option value="B*27:09">B*27:09</option>'+
+                                '<option value="B*27:20">B*27:20</option>'+
+                                '<option value="B*35:01">B*35:01</option>'+
+                                '<option value="B*35:03">B*35:03</option>'+
+                                '<option value="B*37:01">B*37:01</option>'+
+                                '<option value="B*38:01">B*38:01</option>'+
+                                '<option value="B*39:01">B*39:01</option>'+
+                                '<option value="B*39:02">B*39:02</option>'+
+                                '<option value="B*40:01">B*40:01</option>'+
+                                '<option value="B*40:02">B*40:02</option>'+
+                                '<option value="B*40:13">B*40:13</option>'+
+                                '<option value="B*41:01">B*41:01</option>'+
+                                '<option value="B*42:01">B*42:01</option>'+
+                                '<option value="B*44:02">B*44:02</option>'+
+                                '<option value="B*44:03">B*44:03</option>'+
+                                '<option value="B*45:01">B*45:01</option>'+
+                                '<option value="B*46:01">B*46:01</option>'+
+                                '<option value="B*47:01">B*47:01</option>'+
+                                '<option value="B*48:01">B*48:01</option>'+
+                                '<option value="B*49:01">B*49:01</option>'+
+                                '<option value="B*50:01">B*50:01</option>'+
+                                '<option value="B*51:01">B*51:01</option>'+
+                                '<option value="B*53:01">B*53:01</option>'+
+                                '<option value="B*54:01">B*54:01</option>'+
+                                '<option value="B*57:01">B*57:01</option>'+
+                                '<option value="B*58:01">B*58:01</option>'+
+                                '<option value="B*58:02">B*58:02</option>'+
+                                '<option value="B*73:01">B*73:01</option>'+
+                                '<option value="B*83:01">B*83:01</option>'+
+                            '</optgroup>'+
+                            '<optgroup label="HLA-C">'+
+                                '<option value="C*03:03">C*03:03</option>'+
+                                '<option value="C*04:01">C*04:01</option>'+
+                                '<option value="C*05:01">C*05:01</option>'+
+                                '<option value="C*06:01">C*06:01</option>'+
+                                '<option value="C*06:02">C*06:02</option>'+
+                                '<option value="C*07:01">C*07:01</option>'+
+                                '<option value="C*07:02">C*07:02</option>'+
+                                '<option value="C*08:02">C*08:02</option>'+
+                                '<option value="C*12:03">C*12:03</option>'+
+                                '<option value="C*14:02">C*14:02</option>'+
+                                '<option value="C*15:02">C*15:02</option>'+
+                            '</optgroup>'+
+                            '<optgroup label="HLA-E">'+
+                                '<option value="E*01:01">E*01:01</option>'+
+                            '</optgroup>'+
+                        '</select>'+
+                        '</td>' +
+                        '<td><input style="font-size:14px" id="prediction_information" name="prediction" type="text" value="" /></td>' +
+                        '</tr>' +
+                        '</table>' +
+                '</fieldset>';
+
+                $("#toggle_prediction_button").append(usage);
 
 
                 }
@@ -243,6 +394,9 @@
                                         '</td></tr>' +
                                         '</table>' +
                                         '</fieldset>'+
+                                        '<div id="toggle_prediction_button">'+
+                                        '<button onclick="toggle_prediction()" style="font-size:14px">Select HLA epitope prediction</button>'+
+                                        '</div>'+
                                         '</fieldset>';
                         ##detailed_peptide_list.insertAfter($("#query_type_box"));
                         $("#query_type_box").append(detailed_peptide_list);
@@ -267,6 +421,9 @@
                                         '<input type="checkbox" style="font-size:14px" name="peptide_count" value="True" onclick="add_filter()"> Count peptides'+
                                         '</p></tr></td></table>' +
                                         '</form>' +
+                                        '<div id="toggle_prediction_button">'+
+                                        '<button onclick="toggle_prediction()" style="font-size:14px">Select HLA epitope prediction</button>'+
+                                        '</div>'+
                                         '</fieldset>';
                         $("#query_type_box").append(run_name_search);
                     }
@@ -291,7 +448,9 @@
                                         '<input type="checkbox" style="font-size:14px" name="peptide_count" value="True" onclick="add_filter()"> Count peptides'+
                                         '</p></tr></td></table>' +
                                         '</form>' +
-
+                                        '<div id="toggle_prediction_button">'+
+                                        '<button onclick="toggle_prediction()" style="font-size:14px">Select HLA epitope prediction</button>'+
+                                        '</div>'+
                                         '</fieldset>';
                         $("#query_type_box").append(source_search);
                     }

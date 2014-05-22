@@ -95,9 +95,11 @@ def statistics_page(request):
                 seqs=seqs,
                 nSeqs=len(seqs)
     )
-    
+
+
 # Download Query
-@view_config(route_name='data_access', match_param="action=ligandomat_output.xls", renderer='ligandomat:templates/output/table_all_infos.mako', permission='view')
+@view_config(route_name='data_access', match_param="action=ligandomat_output.xls",
+             renderer='ligandomat:templates/output/table_all_infos.mako', permission='view')
 def download(request):
     if 'download_xls' in request.params:
         filename = authenticated_userid(request) + '.xls'
@@ -124,17 +126,58 @@ def access_data_query(request):
     c = conn.cursor(MySQLdb.cursors.DictCursor)
     c.execute("SET tmp_table_size = 16000000")
 
+    # Search for peptide list
     if "search" in request.params:
         # Collecting input from Mako and creating query parts
         search_dict = ast.literal_eval(request.params.get("search"))
-        querystring = queries.search_query_new + create_query(search_dict)
+        querystring = queries.search_query_new
+
+        # header for the output
+        header = ['sequence', 'uniprot_accession', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ',
+                  'minScore', 'maxScore', 'minE', 'maxE', 'minQ', 'maxQ', 'runnames', 'antibody_set', 'organ', 'tissue',
+                  'dignity']
+
+        # including the prediction information into the query
+        if "prediction_information" in search_dict.keys():
+            if search_dict["prediction_information"] != "":
+                # adding the HLA types to the SELECT statement using serious string manipulations
+                querystring_select, querystring_rest = querystring.split("FROM")
+                # all netmhc_3_4 alleles in the database
+                net_mhc_3_4_alleles = ['A_01_01_affinity','A_01_01_score','A_02_01_affinity','A_02_01_score','A_02_02_affinity','A_02_02_score','A_02_03_affinity','A_02_03_score','A_02_06_affinity','A_02_06_score','A_02_11_affinity','A_02_11_score','A_02_12_affinity','A_02_12_score','A_02_16_affinity','A_02_16_score','A_02_17_affinity','A_02_17_score','A_02_19_affinity','A_02_19_score','A_02_50_affinity','A_02_50_score','A_03_01_affinity','A_03_01_score','A_11_01_affinity','A_11_01_score','A_23_01_affinity','A_23_01_score','A_24_02_affinity','A_24_02_score','A_24_03_affinity','A_24_03_score','A_25_01_affinity','A_25_01_score','A_26_01_affinity','A_26_01_score','A_26_02_affinity','A_26_02_score','A_26_03_affinity','A_26_03_score','A_29_02_affinity','A_29_02_score','A_30_01_affinity','A_30_01_score','A_30_02_affinity','A_30_02_score','A_31_01_affinity','A_31_01_score','A_32_01_affinity','A_32_01_score','A_32_07_affinity','A_32_07_score','A_32_15_affinity','A_32_15_score','A_33_01_affinity','A_33_01_score','A_66_01_affinity','A_66_01_score','A_68_01_affinity','A_68_01_score','A_68_02_affinity','A_68_02_score','A_68_23_affinity','A_68_23_score','A_69_01_affinity','A_69_01_score','A_80_01_affinity','A_80_01_score','B_07_02_affinity','B_07_02_score','B_08_01_affinity','B_08_01_score','B_08_02_affinity','B_08_02_score','B_08_03_affinity','B_08_03_score','B_14_02_affinity','B_14_02_score','B_15_01_affinity','B_15_01_score','B_15_02_affinity','B_15_02_score','B_15_03_affinity','B_15_03_score','B_15_09_affinity','B_15_09_score','B_15_17_affinity','B_15_17_score','B_18_01_affinity','B_18_01_score','B_27_05_affinity','B_27_05_score','B_27_20_affinity','B_27_20_score','B_35_01_affinity','B_35_01_score','B_35_03_affinity','B_35_03_score','B_38_01_affinity','B_38_01_score','B_39_01_affinity','B_39_01_score','B_40_01_affinity','B_40_01_score','B_40_02_affinity','B_40_02_score','B_40_13_affinity','B_40_13_score','B_42_01_affinity','B_42_01_score','B_44_02_affinity','B_44_02_score','B_44_03_affinity','B_44_03_score','B_45_01_affinity','B_45_01_score','B_46_01_affinity','B_46_01_score','B_48_01_affinity','B_48_01_score','B_51_01_affinity','B_51_01_score','B_53_01_affinity','B_53_01_score','B_54_01_affinity','B_54_01_score','B_57_01_affinity','B_57_01_score','B_58_01_affinity','B_58_01_score','B_73_01_affinity','B_73_01_score','B_83_01_affinity','B_83_01_score','C_03_03_affinity','C_03_03_score','C_04_01_affinity','C_04_01_score','C_05_01_affinity','C_05_01_score','C_06_02_affinity','C_06_02_score','C_07_01_affinity','C_07_01_score','C_07_02_affinity','C_07_02_score','C_08_02_affinity','C_08_02_score','C_12_03_affinity','C_12_03_score','C_14_02_affinity','C_14_02_score','C_15_02_affinity','C_15_02_score','E_01_01_affinity','E_01_01_score']
+                # all netmhc_170414 alleles in the database
+                syfpeithi_170414_alleles = ['A_01_01_affinity','A_01_01_score','A_02_01_affinity','A_02_01_score','A_03_01_affinity','A_03_01_score','A_11_01_affinity','A_11_01_score','A_24_02_affinity','A_24_02_score','A_26_01_affinity','A_26_01_score','A_31_01_affinity','A_31_01_score','A_32_01_affinity','A_32_01_score','A_33_03_affinity','A_33_03_score','A_68_01_affinity','A_68_01_score','B_07_02_affinity','B_07_02_score','B_08_01_affinity','B_08_01_score','B_13_02_affinity','B_13_02_score','B_14_02_affinity','B_14_02_score','B_15_01_affinity','B_15_01_score','B_15_10_affinity','B_15_10_score','B_15_16_affinity','B_15_16_score','B_18_01_affinity','B_18_01_score','B_27_05_affinity','B_27_05_score','B_27_09_affinity','B_27_09_score','B_35_01_affinity','B_35_01_score','B_37_01_affinity','B_37_01_score','B_38_01_affinity','B_38_01_score','B_39_01_affinity','B_39_01_score','B_39_02_affinity','B_39_02_score','B_40_01_affinity','B_40_01_score','B_40_02_affinity','B_40_02_score','B_41_01_affinity','B_41_01_score','B_44_02_affinity','B_44_02_score','B_45_01_affinity','B_45_01_score','B_47_01_affinity','B_47_01_score','B_49_01_affinity','B_49_01_score','B_50_01_affinity','B_50_01_score','B_51_01_affinity','B_51_01_score','B_53_01_affinity','B_53_01_score','B_57_01_affinity','B_57_01_score','B_58_01_affinity','B_58_01_score','B_58_02_affinity','B_58_02_score','C_04_01_affinity','C_04_01_score','C_05_01_affinity','C_05_01_score','C_06_01_affinity','C_06_01_score']
+
+                # add selected alles to query
+                for hla in search_dict['prediction_information'].split(";"):
+                    hla_databank_format = hla.replace("*", "_").replace(":", "_")
+                    #checking if allele is present in netmhc
+                    if hla_databank_format+"_affinity" in syfpeithi_170414_alleles:
+                        #rename the results to distinguish from which prediction method
+                        querystring_select += ", Prediction_mapping.syfpeithi_170414.%s_affinity AS syfpeithi_170414_%s_affinity, Prediction_mapping.syfpeithi_170414.%s_score AS syfpeithi_170414_%s_score" % (hla_databank_format, hla_databank_format, hla_databank_format, hla_databank_format)
+                        # adding alles to the header
+                        header.append('syfpeithi_170414_%s_affinity'%hla_databank_format)
+                        header.append('syfpeithi_170414_%s_score'%hla_databank_format)
+                    # checking if allele is present in syfpeithi
+                    if hla_databank_format+"_affinity" in net_mhc_3_4_alleles:
+                        #rename the results to distinguish from which prediction method
+                        querystring_select += ", Prediction_mapping.netMHC_3_4.%s_affinity AS netMHC_3_4_%s_affinity , Prediction_mapping.netMHC_3_4.%s_score AS netMHC_3_4_%s_score" % (hla_databank_format, hla_databank_format, hla_databank_format, hla_databank_format)
+                        # adding alles to the header
+                        header.append('netMHC_3_4_%s_affinity'%hla_databank_format)
+                        header.append('netMHC_3_4_%s_score'%hla_databank_format)
+
+                #querystring_select += "," + search_dict["prediction_information"].replace(";", ",").replace("*", "_").replace(":", "_")
+                querystring = querystring_select + "\n FROM \n" + querystring_rest
+                ## adding the innerjoin to the prediction database
+                querystring += "INNER JOIN Prediction_mapping.netMHC_3_4 ON peptide_id = netMHC_3_4.peptide_peptide_id \nINNER JOIN Prediction_mapping.syfpeithi_170414 ON peptide_id = syfpeithi_170414.peptide_peptide_id\n"
+
+        querystring += create_query(search_dict)
 
         print querystring
         c.execute(querystring)
         result = c.fetchall()
 
         # Write ouput
-        header = ['sequence', 'uniprot_accession', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ', 'minScore', 'maxScore', 'minE', 'maxE', 'minQ', 'maxQ', 'runnames', 'antibody_set', 'organ', 'tissue', 'dignity']
+
         filename = authenticated_userid(request) + '.xls'
         if os.path.isfile(filename) == 1:
             os.remove(filename)
@@ -151,32 +194,35 @@ def access_data_query(request):
             result = c.fetchall()
 
             # Write ouput
-            header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass', 'antibody_set', 'hlatype']
+            header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass',
+                      'antibody_set', 'hlatype']
             filename = authenticated_userid(request) + '.xls'
             if os.path.isfile(filename) == 1:
                 os.remove(filename)
             XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
 
             template = Template(filename='./ligandomat/templates/output/table_run_information.mako')
-            result = template.render(rows = result)
+            result = template.render(rows=result)
             conn.close()
             return Response(result)
         else:
             search_dict = ast.literal_eval(request.params.get("search_run_name_name"))
-            querystring = queries.query_run_name_info_peptides % (search_dict["ionscore_input"], search_dict["e_value_input"]
-                                                                  , search_dict["q_value_input"], search_dict["run_name"])
+            querystring = queries.query_run_name_info_peptides % (
+                search_dict["ionscore_input"], search_dict["e_value_input"]
+                , search_dict["q_value_input"], search_dict["run_name"])
             c.execute(querystring)
             result = c.fetchall()
 
             # Write output
-            header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass', 'antibody_set', 'hlatype', 'number_of_peptides']
+            header = ['filename', 'name', 'organ', 'dignity', 'tissue', 'date', 'sample_mass', 'antibody_mass',
+                      'antibody_set', 'hlatype', 'number_of_peptides']
             filename = authenticated_userid(request) + '.xls'
             if os.path.isfile(filename) == 1:
                 os.remove(filename)
             XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
 
             template = Template(filename='./ligandomat/templates/output/table_run_information_peptides.mako')
-            result = template.render(rows = result)
+            result = template.render(rows=result)
             conn.close()
             return Response(result)
 
@@ -193,13 +239,14 @@ def access_data_query(request):
             XlsDictAdapter.XlsDictWriter(filename, result, headerlist=header)
 
             template = Template(filename='./ligandomat/templates/output/table_source_information.mako')
-            result = template.render(rows = result)
+            result = template.render(rows=result)
             conn.close()
             return Response(result)
         else:
             search_dict = ast.literal_eval(request.params.get("search_source_name"))
-            querystring = queries.query_source_info_peptides % (search_dict["ionscore_input"], search_dict["e_value_input"],
-                                                                search_dict["q_value_input"], search_dict["source"])
+            querystring = queries.query_source_info_peptides % (
+                search_dict["ionscore_input"], search_dict["e_value_input"],
+                search_dict["q_value_input"], search_dict["source"])
             #querystring = queries.query_source_info_peptides % (request.params.get("search_source_name"))
             c.execute(querystring)
             result = c.fetchall()
@@ -218,7 +265,6 @@ def access_data_query(request):
 
     # If no case was selected return to the site itself
     return dict(form=form, logged_in=authenticated_userid(request))
-
 
 
 # Forbidden View

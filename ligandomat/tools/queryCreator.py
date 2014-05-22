@@ -196,3 +196,9 @@ def create_query(search_dict):
                      + " GROUP BY sequence"
 
     return filter_string
+
+def hla_information_creator(hla_string):
+    INNERJOIN
+
+    return "deine mudda!!!"
+
