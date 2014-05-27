@@ -188,6 +188,38 @@ def create_query(search_dict):
             else:
                 filter_string += " uniprot_accession_pm LIKE '" + protein.strip() + "' "
         filter_string += ") "
+    # netMHC prediction
+
+    if "netMHC_input" in search_dict.keys():
+        netMHC_information = search_dict["netMHC_information"].replace("*", "_").replace(":", "_").split(";")
+        if first:
+            filter_string += " ( "
+            first = False
+        else:
+            filter_string += " AND ( "
+        # combining the input
+        for i, allele in enumerate(netMHC_information):
+            if i != len(netMHC_information)-1:
+                filter_string+= " Prediction_mapping.netMHC_3_4."+allele+"_affinity"+search_dict["netMHC_comparison"]+search_dict["netMHC_input"]+" "+ search_dict["netMHC_logic"]+" "
+            else:
+                filter_string += "Prediction_mapping.netMHC_3_4."+allele+"_affinity"+search_dict["netMHC_comparison"]+search_dict["netMHC_input"]+" "
+        filter_string += ") "
+
+    # syfpeithi prediction
+    if "syfpeithi_input" in search_dict.keys():
+        syfpeithi_information = search_dict["syfpeithi_information"].replace("*", "_").replace(":", "_").split(";")
+        if first:
+            filter_string += " ( "
+            first = False
+        else:
+            filter_string += " AND ( "
+        # combining the input
+        for i, allele in enumerate(syfpeithi_information):
+            if i != len(syfpeithi_information)-1:
+                filter_string+= " Prediction_mapping.syfpeithi_170414."+allele+"_affinity"+search_dict["syfpeithi_comparison"]+search_dict["syfpeithi_input"] + " " + search_dict["syfpeithi_logic"]+" "
+            else:
+                filter_string += "Prediction_mapping.syfpeithi_170414."+allele+"_affinity"+search_dict["syfpeithi_comparison"]+search_dict["syfpeithi_input"] + " "
+        filter_string += ") "
 
     # Standard filters
     filter_string += " AND ionscore > " + str(search_dict["ionscore_input"]) \
@@ -196,3 +228,5 @@ def create_query(search_dict):
                      + " GROUP BY sequence"
 
     return filter_string
+
+
