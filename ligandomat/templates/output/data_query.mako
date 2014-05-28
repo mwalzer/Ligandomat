@@ -139,7 +139,8 @@ var prediction_code =
         "netMHC_information", "netMHC_input", "netMHC_logic", "netMHC_comparison",
         "syfpeithi_information", "syfpeithi_input", "syfpeithi_logic", "syfpeithi_comparison",
         "prediction_information",
-        "ionscore_input", "e_value_input", "q_value_input"];
+        "aa_length_start","aa_length_end",
+        "ionscore_input", "q_value_input"];
     var values_string = "{";
     for (var i = 0; i < element_values.length; i++) {
         if (document.getElementById(element_values[i]) != null) {
@@ -155,10 +156,10 @@ function combine_run_name_source_query() {
         ## Which query?
             var element_values = [];
         if (document.getElementById("search_run_name_id") != null) {
-            element_values = ["run_name", "prediction_information", "ionscore_input", "e_value_input", "q_value_input"];
+            element_values = ["run_name", "prediction_information", "aa_length_start","aa_length_end", "ionscore_input", "e_value_input", "q_value_input"];
         }
         else if (document.getElementById("search_source_id") != null) {
-            element_values = ["source", "prediction_information", "ionscore_input", "e_value_input", "q_value_input"];
+            element_values = ["source", "prediction_information", "aa_length_start","aa_length_end","ionscore_input", "e_value_input", "q_value_input"];
         }
         ## Get the items
             var values_string = "{";
@@ -295,18 +296,19 @@ function add_filter() {
                 } else {
                     var filter_list =
                             '<fieldset id="filter_list_box">' +
-                                    '<legend>Filter:</legend>' +
-                                    '<table style="width:400px" id="filter_list">' +
-                                    '<tr><td>Ion score </td><td>> </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" type="text" value="20" /></td></tr>' +
+                                        '<legend>Filter:</legend>' +
+                                        '<table id="filter_list">' +
+                                        '<tr><td >Ion score </td><td>>= </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" size="3" type="text" value="20" /></td></tr>' +
 
-                                    '<tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" id="e_value_input" name="e-Value" type="text" value="1"/></td></tr>' +
+                                        '<tr><td>q-Value </td><td><=  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" size="3" type="text" value="0.05" />' +
 
-                                    '<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" type="text" value="1" />' +
-                                    '<button onclick="help_alert(\'filter_help\')" style="font-size:14px">?</button>' +
-                                    '</td></tr>' +
-                                    '</table>' +
 
-                                    '</fieldset>';
+
+                                       '</td></tr>' +
+                                        '</table>' +
+                                        'Peptide length between: <input style="font-size:14px" id="aa_length_start" name="aa_length_start_name" size="3" type="text" value="8" /> and <input style="font-size:14px" id="aa_length_end" name="aa_length_end_name" size="3" type="text" value="12" />'+
+                                        '<button onclick="help_alert(\'filter_help\')" style="font-size:14px">?</button>' +
+                                        '</fieldset>';
 
                     $("#source_query_box").append(filter_list);
                     $("#run_name_query_box").append(filter_list);
@@ -388,15 +390,16 @@ function add_filter() {
                                     <!-- Filter criteria -->
                                         '<fieldset id="filter_list_box">' +
                                         '<legend>Filter:</legend>' +
-                                        '<table style="width:400px" id="filter_list">' +
-                                        '<tr><td>Ion score </td><td>> </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" type="text" value="20" /></td></tr>' +
+                                        '<table id="filter_list">' +
+                                        '<tr><td >Ion score </td><td>>= </td> <td><input style="font-size:14px" id="ionscore_input" name="ionscore" size="3" type="text" value="20" /></td></tr>' +
+                                        '<tr><td>q-Value </td><td><=  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" size="3" type="text" value="0.05" />' +
 
-                                        '<tr><td>e-Value </td><td><   </td><td><input style="font-size:14px" id="e_value_input" name="e-Value" type="text" value="1"/></td></tr>' +
 
-                                        '<tr><td>q-Value </td><td><  </td> <td><input style="font-size:14px" id="q_value_input" name="q-Value" type="text" value="1" />' +
-                                        '<button onclick="help_alert(\'filter_help\')" style="font-size:14px">?</button>' +
-                                        '</td></tr>' +
+
+                                       '</td></tr>' +
                                         '</table>' +
+                                        'Peptide length between: <input style="font-size:14px" id="aa_length_start" name="aa_length_start_name" size="3" type="text" value="8" /> and <input style="font-size:14px" id="aa_length_end" name="aa_length_end_name" size="3" type="text" value="12" />'+
+                                        '<button onclick="help_alert(\'filter_help\')" style="font-size:14px">?</button>' +
                                         '</fieldset>' +
                                         '<div id="toggle_prediction_button">' +
                                         '<button onclick="toggle_prediction()" style="font-size:14px">Select HLA epitope prediction</button>' +

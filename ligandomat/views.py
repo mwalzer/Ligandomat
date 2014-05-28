@@ -134,7 +134,7 @@ def access_data_query(request):
 
         # header for the output
         header = ['sequence', 'uniprot_accession', 'sourcename', 'hlatype', 'minRT', 'maxRT', 'minMZ', 'maxMZ',
-                  'minScore', 'maxScore', 'minE', 'maxE', 'minQ', 'maxQ', 'runnames', 'antibody_set', 'organ', 'tissue',
+                  'minScore', 'maxScore', 'minE', 'maxE', 'minQ', 'maxQ', 'filename', 'PSM', 'antibody_set', 'organ', 'tissue',
                   'dignity']
 
         # including the prediction information into the query
@@ -187,7 +187,7 @@ def access_data_query(request):
         c.execute(querystring)
         result = c.fetchall()
 
-        # Write ouput
+        # Write output
         filename = authenticated_userid(request) + '.xls'
         if os.path.isfile(filename) == 1:
             os.remove(filename)
@@ -219,8 +219,9 @@ def access_data_query(request):
         else:
             search_dict = ast.literal_eval(request.params.get("search_run_name_name"))
             querystring = queries.query_run_name_info_peptides % (
-                search_dict["ionscore_input"], search_dict["e_value_input"]
-                , search_dict["q_value_input"], search_dict["run_name"])
+                search_dict["ionscore_input"], search_dict["q_value_input"],
+                search_dict["aa_length_start"], search_dict["aa_length_end"],
+                search_dict["run_name"])
             c.execute(querystring)
             result = c.fetchall()
 
@@ -256,8 +257,8 @@ def access_data_query(request):
         else:
             search_dict = ast.literal_eval(request.params.get("search_source_name"))
             querystring = queries.query_source_info_peptides % (
-                search_dict["ionscore_input"], search_dict["e_value_input"],
-                search_dict["q_value_input"], search_dict["source"])
+                search_dict["ionscore_input"],
+                search_dict["q_value_input"],search_dict["aa_length_start"], search_dict["aa_length_end"], search_dict["source"])
             #querystring = queries.query_source_info_peptides % (request.params.get("search_source_name"))
             c.execute(querystring)
             result = c.fetchall()

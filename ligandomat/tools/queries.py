@@ -31,9 +31,9 @@ FROM
 		INNER JOIN LigandosphereDB_dev.source_hlatyping ON source_hlatyping.source_source_id = source_id
 		INNER JOIN LigandosphereDB_dev.hlaallele ON hlaallele_id = source_hlatyping.hlaallele_hlaallele_id
 		INNER JOIN LigandosphereDB_dev.ms_run ON ms_run.source_source_id = source.source_id
-		INNER JOIN LigandosphereDB_dev.spectrum_hit ON ms_run_ms_run_id = ms_run_id AND ionscore >%s AND e_value<%s AND q_value <%s
-		INNER JOIN LigandosphereDB_dev.peptide ON peptide_id = peptide_peptide_id
-WHERE source.name LIKE '%s'
+		INNER JOIN LigandosphereDB_dev.spectrum_hit ON ms_run_ms_run_id = ms_run_id AND ionscore >%s AND q_value <%s
+		INNER JOIN LigandosphereDB_dev.peptide ON peptide_id = peptide_peptide_id WHERE LENGTH(sequence) BETWEEN %s AND %s
+AND source.name LIKE '%s'
 GROUP BY source.name
 """
 
@@ -61,9 +61,9 @@ FROM
 		INNER JOIN LigandosphereDB_dev.hlaallele ON hlaallele_id = source_hlatyping.hlaallele_hlaallele_id
 		INNER JOIN LigandosphereDB_dev.mhcpraep ON mhcpraep_id = ms_run.mhcpraep_mhcpraep_id
 		INNER JOIN LigandosphereDB_dev.person ON person_id = ms_run.person_person_id
-		INNER JOIN LigandosphereDB_dev.spectrum_hit ON ms_run_ms_run_id = ms_run_id AND ionscore >%s AND e_value<%s AND q_value <%s
-		INNER JOIN LigandosphereDB_dev.peptide ON peptide_id = peptide_peptide_id
-WHERE filename LIKE '%s'
+		INNER JOIN LigandosphereDB_dev.spectrum_hit ON ms_run_ms_run_id = ms_run_id AND ionscore >%s AND q_value <%s
+		INNER JOIN LigandosphereDB_dev.peptide ON peptide_id = peptide_peptide_id WHERE LENGTH(sequence) BETWEEN %s AND %s
+AND filename LIKE '%s'
 GROUP BY filename
 """
 
@@ -97,7 +97,6 @@ search_query_new = """
 SELECT
         sequence,
     GROUP_CONCAT(DISTINCT source.name SEPARATOR ', ') AS sourcename,
-    GROUP_CONCAT(DISTINCT source.name SEPARATOR ', ') AS sourcename,
     CASE
 WHEN expression_suffix IS NOT NULL THEN GROUP_CONCAT(DISTINCT
 		Concat(gene_group,':', specific_protein,':',dna_coding,':',dna_noncoding,expression_suffix)
@@ -121,8 +120,8 @@ ELSE GROUP_CONCAT(DISTINCT gene_group SEPARATOR ', ')
     ROUND(MAX(e_value), 2) as maxE,
     ROUND(MIN(q_value), 2) as minQ,
     ROUND(MAX(q_value), 2) as maxQ,
-    GROUP_CONCAT(DISTINCT filename
-        SEPARATOR ', ') as 'runnames',
+	COUNT(Distinct spectrum_hit_id) as PSM,
+    filename,
     antibody_set,
     GROUP_CONCAT(DISTINCT organ SEPARATOR ', ') as organ,
     GROUP_CONCAT(DISTINCT tissue SEPARATOR ', ') as tissue,

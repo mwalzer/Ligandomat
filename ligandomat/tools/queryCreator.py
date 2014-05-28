@@ -222,10 +222,11 @@ def create_query(search_dict):
         filter_string += ") "
 
     # Standard filters
-    filter_string += " AND ionscore > " + str(search_dict["ionscore_input"]) \
-                     + " AND e_value < " + str(search_dict["e_value_input"]) \
-                     + " AND q_value < " + str(search_dict["q_value_input"]) \
-                     + " GROUP BY sequence"
+    filter_string += " AND ionscore >= " + str(search_dict["ionscore_input"]) \
+                     + " AND q_value <= " + str(search_dict["q_value_input"]) \
+                     + " AND LENGTH(sequence) BETWEEN "+ str(search_dict["aa_length_start"])\
+                     + " AND " + str(search_dict["aa_length_end"])\
+                     + " GROUP BY filename, sequence"
 
     return filter_string
 
